@@ -270,7 +270,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -318,7 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
+  m_MinWidth: 120
   m_MinHeight: -1
   m_PreferredWidth: 0
   m_PreferredHeight: -1
@@ -632,7 +632,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
+  m_MinWidth: 157
   m_MinHeight: -1
   m_PreferredWidth: -1
   m_PreferredHeight: -1
@@ -1443,6 +1443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rootParameter: {fileID: 0}
   blocksFactory: {fileID: 0}
+  variableManager: {fileID: 0}
   parentesesInstance: {fileID: 537954446766339063}
   childParamLayout: {fileID: 3819225133399394845}
   inputTextPrefab: {fileID: 3031456474331586295, guid: 73567ca758bb2c24ca301bec2a8ee502, type: 3}
@@ -1460,7 +1461,6 @@ MonoBehaviour:
   selectedValueSection: 0
   selectedValueKey: 
   selectedVariableName: 
-  varNameOfParent: 
   selectedSection: {fileID: 0}
 --- !u!114 &2373152039394558971
 MonoBehaviour:
@@ -2296,7 +2296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
+  m_MinWidth: 157
   m_MinHeight: -1
   m_PreferredWidth: -1
   m_PreferredHeight: -1

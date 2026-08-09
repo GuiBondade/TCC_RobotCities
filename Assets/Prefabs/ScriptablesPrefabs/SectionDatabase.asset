@@ -15,8 +15,8 @@ MonoBehaviour:
   sectionEntries:
   - section: 0
     values:
-    - falso
     - verdadeiro
+    - falso
   - section: 1
     values:
     - ==

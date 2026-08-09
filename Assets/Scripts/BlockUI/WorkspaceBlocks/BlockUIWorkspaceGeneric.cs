@@ -1,0 +1,7 @@
+using UnityEngine;
+
+public class BlockUIWorkspaceGeneric : MonoBehaviour
+{    
+    // ACHO QUE POR ENQUANTO NAO PRECISA, QUANDO TIVER FEITO O DE COMEÇO DE LINHA PODE SER QUE HAJA COISAS REPETIDAS E DAI CRIA ISSO ENTAO
+
+}

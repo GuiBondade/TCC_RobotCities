@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182b4c78af87056448953178db4fdeb7, type: 3}
   m_Name: "Vari\xE1vel"
   m_EditorClassIdentifier: 
-  id: variavel
+  id: SetVar
   blockName: "Vari\xE1vel"
   function: 0
   color: {r: 1, g: 0, b: 0.9729543, a: 1}

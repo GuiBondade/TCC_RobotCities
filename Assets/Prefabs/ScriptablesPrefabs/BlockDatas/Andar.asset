@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182b4c78af87056448953178db4fdeb7, type: 3}
   m_Name: Andar
   m_EditorClassIdentifier: 
-  id: andar
+  id: Walk
   blockName: Andar
   function: 0
   color: {r: 1, g: 1, b: 1, a: 1}

@@ -97,3 +97,10 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Ignora a pasta de configurações locais do VS Code
+.vscode/
+
+# Ignora arquivos de manifesto extras do compilador (arquivos com ícone de RSS na imagem)
+*.csproj
+*.editor
