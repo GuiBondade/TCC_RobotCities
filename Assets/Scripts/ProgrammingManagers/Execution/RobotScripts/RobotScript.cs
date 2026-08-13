@@ -6,43 +6,35 @@ using ScriptRunner;
 
 public class RobotScript : MonoBehaviour // arquivo set/delete json
 {
-    public RobotMovement robotMovement;
-    public RobotInventory robotInventory;
+    [SerializeField] public RobotMovement robotMovement;
+    [SerializeField] public RobotInventory robotInventory;
 
-    public ScriptData scriptTarget;
+    public ScriptData scriptData;// pura referencia pro script anexado como código(que sepa da até de tirar)
+    public ExecutionContext executionContext;// contexto exato em execução
+
+    public RobotData robotData { get; private set; }// pra setar interface do robo
+
+    public void Awake() {
+        robotData = ScriptableObject.CreateInstance<RobotData>();
+        // robotData.name = "nao repetir nome";
+    }
 
     public void Start() {
         RobotSignals.OnScriptAttached += OnScriptChosen;    
     }
 
     public void OnScriptChosen(ScriptData script) {
-        scriptTarget = script;
+        scriptData = script;
     }
 
-    public void TestExecution(int scriptId)// SetExecution => vai ser chamado pelos robos, e vai retornar o context
+    public void TestExecution()// SetExecution => vai ser chamado pelos robos, e vai retornar o context
     {
-        if (scriptId < 0) return;
+        if (scriptData == null) return;
         // essa funcao vai ser chamada quando tentar ativar a execução do script anexado, 
         // porém somente se tiver selecionado ãlgum script no dropdown
         Debug.Log("Executando");
-        ExecutionContext context = new ExecutionContext();
-        context.robotScript = this;
 
-        //ScriptData scriptTarget = ScriptManager.instancia.scripts[scriptId];
-        
-        if (scriptTarget.vars != null)
-        {
-            foreach (var var in scriptTarget.vars)
-            {
-                object valorInicial = ValueParser.ParseRawString(var.defaultValue);
-                
-                context.SetVariable(var.varName, valorInicial);
-            }
-        }
-
-        context.current = scriptTarget.functionsRoot[0];
-
-        RobotSignals.TriggerExecutionActivation(context);
+        RobotSignals.TriggerExecutionActivation(this); 
     } 
 
     public void StartSetup(Vector3Int position, Vector2 tileSize, float robotSpeed) {

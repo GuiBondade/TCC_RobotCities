@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class ScriptSpawner : MonoBehaviour
 {
-    public ScriptManager scriptManager; 
-    public ScriptInterface scriptUIPrefab;
-    public Transform scriptContainer;
-    public string defaultName;
+    [SerializeField] private ScriptManager scriptManager; 
+    [SerializeField] private ScriptInterface scriptUIPrefab;
+    [SerializeField] private Transform scriptContainer;
+    [SerializeField] private string defaultName;
 
     private int scriptCounter = 0;
+
+    void Start() {
+        AddScript();
+    }
 
     public void AddScript() {
         string name = defaultName;// função de não repetir nome (talvez reusar o de variavel, so que ter que passar lista tambem)
@@ -17,9 +21,9 @@ public class ScriptSpawner : MonoBehaviour
             id = scriptCounter,
             name = defaultName,
         };
-        scriptCounter++;
         ScriptSignals.TriggerScriptCreation(scriptAdded);
-        var scriptUI = Instantiate(scriptUIPrefab, scriptContainer);
-        scriptUI.scriptData = scriptAdded;
+        scriptCounter++;
+        var scriptInterface = Instantiate(scriptUIPrefab, scriptContainer);
+        scriptInterface.Setup(scriptManager, scriptAdded);
     } 
 }

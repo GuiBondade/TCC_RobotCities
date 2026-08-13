@@ -21,11 +21,6 @@ public class ScriptData // vai ser preenchido na inicialização e no save
 
 public class ScriptManager : MonoBehaviour // arquivo set/delete json
 {
-    /* 
-        TEM QUE TER UM SCRIPT COM FUNÇÕES DE UI PARA CRIAR NOVO SCRIPT E ADICIONÁ-LO NO DICIONARIO COM ID NOVO
-        COM NOME DEFAULT, PODER ALTERAR O NOME DO SCRIPT, PODER DELETAR O SCRIPT E TAMBEM DO DICIONARIO
-     */
-
     public static ScriptManager instancia { get; private set; }
 
     public WorkspaceBuilder graphBuilder;
@@ -34,22 +29,25 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
     private ScriptData scriptOnFocus;
     public List<ScriptData> scripts = new List<ScriptData>();
     
+    void Awake() {
+        if (instancia == null) instancia = this;
+        else if (instancia != this) {
+            Debug.Log("Duplicata desnecessária de ScriptManager destruída");
+            Destroy(gameObject);
+        }
+    }
+
     void Start() {
         instancia = this;
 
         ScriptSignals.OnDeleteScript += DeleteScript;
         ScriptSignals.OnOpenScript += OpenScript;
         ScriptSignals.OnCreateScript += CreateScript;
-
-        scriptOnFocus = new ScriptData(){
-            id = 0,
-            name = "scriptDefault",
-        };
-        scripts.Add(scriptOnFocus);
     }
 
     public void TestGraph() // save (set)
     {
+        Debug.Log("salvando script: " + scriptOnFocus.id);
         scriptOnFocus.nodes = graphBuilder.WorkspaceBuildGraph();
         jsonBuilder.SaveAsJson(scriptOnFocus.nodes, scriptOnFocus.name);
 
@@ -79,11 +77,11 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
 
         scriptOnFocus.functionsRoot = roots;
         scriptOnFocus.vars = varList;
-        //scriptIdCounter++; // esse trampo do id vai ser feito quando criar um script novo, e não quando salvar
     }
 
     public void OpenScript(ScriptData script)
     {
+        Debug.Log("Build blocks from script: " + script.id);
         SaveNodesData nodes = script.nodes;
         jsonBuilder.BuildBlocksFromData(nodes);
         scriptOnFocus = script;
@@ -98,49 +96,4 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
     {
         scripts.Add(script);
     }
-
-
-
-
-
-
-
-
-
-
-    /* public void TestExecution(int scriptId)// SetExecution => vai ser chamado pelos robos, e vai retornar o context
-    {
-        if (scriptId < 0) return;
-        // essa funcao vai ser chamada quando tentar ativar a execução do script anexado, 
-        // porém somente se tiver selecionado ãlgum script no dropdown
-        Debug.Log("Executando");
-        ExecutionContext context = new ExecutionContext();
-        context.robotScript = GetComponent<RobotScript>();
-        Debug.Log(this.name);
-
-        ScriptCompilado scriptTarget = compiledScripts[scriptId];
-        
-        if (scriptTarget.vars != null)
-        {
-            foreach (var varNode in scriptTarget.vars)
-            {
-                object valorInicial = ValueParser.ParseRawString(varNode.defaultValue);
-                
-                context.SetVariable(varNode.varName, valorInicial);
-            }
-        }
-
-        context.current = scriptTarget.current;
-
-        // adicionar na lista de execucao durante tick
-        // vai ser feito pelo proprio robo
-        ActivateScript(context);
-
-    }
-
-    public void ActivateScript(ExecutionContext context){
-
-        functionsInExecution.Add(context);
-        // setar bloco current
-    } */
 }

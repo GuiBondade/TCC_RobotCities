@@ -19,12 +19,6 @@ public enum BlockFunction { // alterar depois, nao sei como (talvez enum de cham
     Event
 }
 
-/* [System.Serializable]
-public class ParameterInfo {
-    public string name;
-    public ParameterType type;
-} */
-
 public enum PrefabsId {
     next,
     body,

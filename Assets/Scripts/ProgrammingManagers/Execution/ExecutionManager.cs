@@ -24,12 +24,31 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
     private void OnEnable() => RobotSignals.OnActivateExecution += ActivateExecution;
     private void OnDisable() => RobotSignals.OnDeactivateExecution -= DeactivateExecution;
 
-    public void ActivateExecution(ExecutionContext context){
+    public void ActivateExecution(RobotScript robot){
+        // o bloco identado é a criação de contexto que deve ser feita em outro script pra melhor arquitetura de código
+        // da pra por no executionManager no executionActivated, antes de adicionar na lista
+        var context = new ExecutionContext();
+        context.robotScript = robot;
+        
+        ScriptData scriptData = robot.scriptData;
+
+        if (scriptData.vars != null)
+        {
+            foreach (var var in scriptData.vars)
+            {
+                object valorInicial = ValueParser.ParseRawString(var.defaultValue);
+                
+                context.SetVariable(var.varName, valorInicial);
+            }
+        }
+        context.current = scriptData.functionsRoot[0];
+        robot.executionContext = context;
+
         functionsInExecution.Add(context);
     }
 
-    public void DeactivateExecution(ExecutionContext context){
-        functionsInExecution.Remove(context);
+    public void DeactivateExecution(RobotScript robot){
+        functionsInExecution.Remove(robot.executionContext);
     }
 
     void Update() {
@@ -55,8 +74,8 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
             Debug.Log("Bloco Executado");
             context.current = context.current.Execute(context);
         }
-        foreach (var script in functionsToRemove){
-            functionsInExecution.Remove(script);
+        foreach (var context in functionsToRemove){
+            functionsInExecution.Remove(context);
         }
     }
 }
