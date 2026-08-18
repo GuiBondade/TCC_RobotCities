@@ -19,10 +19,8 @@ public class RobotInterface : MonoBehaviour
     private RobotScript robotScript;
     private RobotData data;
 
-    void Start() {
+    public void SetSignal() {
         RobotSignals.OnInterfaceOpen += Setup; 
-        gameObject.SetActive(false);
-
         executionToggle.OnToggleStateChanged += ExecutionToggled;
         debugToggle.OnToggleStateChanged += DebugToggled;
     }

@@ -40,16 +40,14 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
     void Start() {
         instancia = this;
 
-        ScriptSignals.OnDeleteScript += DeleteScript;
-        ScriptSignals.OnOpenScript += OpenScript;
         ScriptSignals.OnCreateScript += CreateScript;
     }
 
     public void TestGraph() // save (set)
     {
         Debug.Log("salvando script: " + scriptOnFocus.id);
-        scriptOnFocus.nodes = graphBuilder.WorkspaceBuildGraph();
-        jsonBuilder.SaveAsJson(scriptOnFocus.nodes, scriptOnFocus.name);
+        scriptOnFocus.nodes = graphBuilder.WorkspaceBuildGraph(scriptOnFocus.nodes);
+        jsonBuilder.SaveAsJson(scriptOnFocus.nodes, scriptOnFocus.id.ToString());
 
         foreach (var p in scriptOnFocus.nodes.parametrosData)
         {
@@ -63,7 +61,7 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
         Debug.Log("Compilando");
         
         BlockCompiler compiler = new BlockCompiler();
-        ExecutionBlock root = compiler.Compile(scriptOnFocus.nodes, 0);// tem que considerar uma lista de primeiros blocos
+        ExecutionBlock root = compiler.Compile(scriptOnFocus.nodes, 0/* esse 0 ta bem errado, tem que ser o id do primeiro */);// tem que considerar uma lista de primeiros blocos
         List<ExecutionBlock> roots = new List<ExecutionBlock>();
         roots.Add(root);
         List<VariableData> varList = new List<VariableData>();
@@ -83,13 +81,17 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
     {
         Debug.Log("Build blocks from script: " + script.id);
         SaveNodesData nodes = script.nodes;
+        //dar clear dos blocos na workspace
+        // talvez iterar sobre os filhos diretos da content Workspace e da blocksFactory.CleanUpBlock()
         jsonBuilder.BuildBlocksFromData(nodes);
         scriptOnFocus = script;
     }
 
     public void DeleteScript(ScriptData script)
     {
+        // if (script == scriptOnFocus) blocksFactory.CleanUpWorkspace();
         scripts.Remove(script);
+        jsonBuilder.DeleteJson(script.id.ToString());
     }
 
     public void CreateScript(ScriptData script)

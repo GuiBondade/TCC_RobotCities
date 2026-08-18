@@ -114,18 +114,8 @@ namespace ScriptRunner
             int dist = (int)_distProvider.GetValue(context); // tem que ser inteiro
             
             robotMovement.MoveTo(dir, dist);
-            //Vector3 target = robotMovement.position + (dir.normalized * dist);
 
             context.ticksOcupado = dist;
-
-            /* // DA PRA POR DIRETO NO SCRIPT MANAGER SEPA?
-            // ATE PORQUE VAI SER EM TILES E NAO POSITION NORMAL
-            while (Vector3.Distance(robotMovement.position, target) > 0.01f)
-            {
-                robotMovement.position = Vector3.MoveTowards(robotMovement.position, target, 5f * Time.deltaTime);
-                await Task.Yield(); 
-                // ESPERAR UM FRAME, DA PRA SUBSTITUIR POR COROUTINE 
-            } */
 
             return Next;
         }

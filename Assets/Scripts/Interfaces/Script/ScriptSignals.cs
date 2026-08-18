@@ -1,20 +1,21 @@
 using System;
+using UnityEngine;
 
 public static class ScriptSignals
 {
     public static event Action<ScriptData> OnCreateScript;
-    public static event Action<ScriptData> OnDeleteScript;
-    public static event Action<ScriptData> OnOpenScript;
+    public static event Action<GameObject, ScriptData> OnDeleteInterfaceOpen;
+    public static event Action<GameObject, ScriptData> OnDeleteInterfaceAccepted;
 
     public static void TriggerScriptCreation(ScriptData script){
         OnCreateScript?.Invoke(script);
     }
 
-    public static void TriggerScriptDeletion(ScriptData script){
-        OnDeleteScript?.Invoke(script);
+    public static void TriggerDeletionInterfaceOpen(GameObject scriptGO, ScriptData scriptData){
+        OnDeleteInterfaceOpen?.Invoke(scriptGO, scriptData);
     }
 
-    public static void TriggerScriptOpen(ScriptData script){
-        OnOpenScript?.Invoke(script);
+    public static void TriggerDeletionInterfaceAccepted(GameObject scriptGO, ScriptData scriptData){
+        OnDeleteInterfaceAccepted?.Invoke(scriptGO, scriptData);
     }
 }

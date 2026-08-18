@@ -13,7 +13,7 @@ public class WorkspaceBuilder : MonoBehaviour
 {
     private Dictionary<BlockUI, int> blockIdMap = new();
     private Dictionary<ReferenceHolder, int> paramIdMap = new();
-    private SaveNodesData nodesData = new();
+    private SaveNodesData nodesData;
     private int blockIdCounter = 0;
     private int paramIdCounter = 0;
     private int blockRootId = 0;
@@ -29,13 +29,15 @@ public class WorkspaceBuilder : MonoBehaviour
         inputIntValueName = sectionDatabase.GetValuesForSection(ParameterSections.IntValues)[0];
     }
 
-    public SaveNodesData WorkspaceBuildGraph() {
+    public SaveNodesData WorkspaceBuildGraph(SaveNodesData nodes) {
         paramIdMap.Clear();
         blockIdMap.Clear();
-        nodesData.blocosData.Clear();
-        nodesData.parametrosData.Clear();
-        nodesData.variaveisData.Clear();
-        nodesData.Clear();
+        if (nodes == null) nodesData = new SaveNodesData();
+        else {
+            nodesData.blocosData.Clear();
+            nodesData.parametrosData.Clear();
+            nodesData.variaveisData.Clear();
+        }
         paramIdCounter = 0;
         blockIdCounter = 0;
 

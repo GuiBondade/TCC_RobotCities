@@ -28,19 +28,20 @@ public class ScriptJSONBuilder : MonoBehaviour
         File.WriteAllText(path, json);
     }
 
+    public void DeleteJson(string name) {
+        string filePath = Path.Combine(Application.persistentDataPath, name);
+        if (File.Exists(filePath)) {
+            File.Delete(filePath);
+        } else {
+            Debug.Log("Arquivo não encontrado: " + name);
+        }
+    }
+
     public void BuildBlocksFromData(SaveNodesData data) {
         if (data == null) return;
         
-        VariableManager.instancia.Clear(); // FAZER ISSO NA CHAMADA DA CONSTRUÇÃO CASO ESTEJA ABRINDO OUTRO SCRIPT, NORMALMENTE SO ADICIONA
-        // E SE ADICIONAR UMA VARIAVEL DE MESMO NOME QUE UMA JA EXISTENTE? TEM QUE VER
-
-        // NA VERDADE, DA DE FAZER QUE QUANDO ADICIONAR UM SCRIPT DIFERENTE EM UM EXISTENTE SER UM BLOCO COMUM, REPRESENTANDO TODO ELE
-        // MAS OS BLOCOS TEM INICIO DE LINHA NÉ
-        // SEPA QUE: DA DE IMPORTAR OUTROS SCRIPTS COMO MODULOS, DAI SERIA TIPO UM BLOCO DE CRIAR VARIAVEL, MAS DE IMPORTAÇÃO, AI TU PODE
-        // CHAMAR O SIGNAL PRA UMA FUNÇÃO DO SCRIPT IMPORTADO (ADICIONA UMA SEÇÃO PRO DROPDOWN DE SIGNALS) E PASSAR OS PARAMETROS
-        // AI DARIA PRA VER TAMBÉM DE PODER ADICIONAR AS VARIAVEIS DO SCRIPT IMPORTADO COMO SEÇÃO DO MESMO JEITO
-        // SO TERIA QUE FAZER ALGO VISUAL, COMO "nomeImportacao.funcao(ou variavel)" 
-
+        VariableManager.instancia.Clear(); 
+        
         foreach(var varNode in data.variaveisData){
             CreateVariableUI visualVar = blocksFactory.InitializeCreateVariable(workspace, false);
             visualVar.SetupWithData(varNode.varName, varNode.type, varNode.section, varNode.defaultValue);

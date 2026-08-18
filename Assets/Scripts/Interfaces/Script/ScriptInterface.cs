@@ -23,10 +23,7 @@ public class ScriptInterface : MonoBehaviour
     }
 
     public void ScriptDeleted() {
-        // abre interface de confirmação, e quando clicar no botão dentro da interface emite o event
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            scriptManager.DeleteScript(scriptData);
-            // Destroy(self);
+        ScriptSignals.TriggerDeletionInterfaceOpen(gameObject, scriptData);
     }
 
     public void ScriptOpened() {

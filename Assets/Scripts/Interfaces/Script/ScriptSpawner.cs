@@ -12,6 +12,7 @@ public class ScriptSpawner : MonoBehaviour
     private int scriptCounter = 0;
 
     void Start() {
+        ScriptSignals.OnDeleteInterfaceAccepted += DeleteScript;
         AddScript();
     }
 
@@ -26,4 +27,12 @@ public class ScriptSpawner : MonoBehaviour
         var scriptInterface = Instantiate(scriptUIPrefab, scriptContainer);
         scriptInterface.Setup(scriptManager, scriptAdded);
     } 
+
+    public void DeleteScript(GameObject scriptGO, ScriptData scriptData) {
+        if (scriptManager.scripts.Count <= 1) {
+            AddScript();
+        }
+        scriptManager.DeleteScript(scriptData);
+        Destroy(scriptGO);
+    }
 }
