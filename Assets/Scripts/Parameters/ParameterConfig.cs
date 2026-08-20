@@ -34,47 +34,26 @@ public class ParameterConfig : MonoBehaviour
     }
 
     public void ValuePressionado(ValueInfo valuePressed) {
-        if (refs.selectedValueKey == null || valuePressed.value != refs.selectedValueKey) { 
+        bool sameValue = refs.selectedValueKey != null
+            && valuePressed.value == refs.selectedValueKey;
+        bool needsOperandRebuild = sameValue
+            && NeedsOperandRebuild(valuePressed.sectionCurrent, valuePressed.value);
+
+        if (!sameValue || needsOperandRebuild) {
             // refs.placeholderLabel vai ser o valor final(por enquanto), depois vai ter somente valor equivalente ao atribuido ao valor final
             // atribuir valor no setup/config para leitura pratica no save
             string valueText = valuePressed.label.text;
             refs.placeholderLabel.text = valueText; 
             refs.placeholderLabel.ForceMeshUpdate();
-            if (valuePressed.sectionCurrent != refs.selectedValueSection) {
+
+            bool sectionChanged = valuePressed.sectionCurrent != refs.selectedValueSection;
+            bool operationShapeChanged = valuePressed.sectionCurrent == ParameterSections.BoolLogicOperations
+                && refs.selectedValueKey != null
+                && IsUnaryOperation(refs.selectedValueKey) != IsUnaryOperation(valuePressed.value);
+
+            if (sectionChanged || operationShapeChanged || needsOperandRebuild) {
                 ResetParameterState();
-                // trocou de seção
-                switch (valuePressed.sectionCurrent) {
-                    case ParameterSections.BoolValues:
-                    case ParameterSections.DirectionValues:
-                    case ParameterSections.MaterialValues:
-                    case ParameterSections.IntValues:
-                        break; 
-                    case ParameterSections.BoolLogicOperations:
-                        refs.parentesesInstance.SetActive(true);
-                        InstantiateParameter(ref refs.leftOperand, ParameterType.BooleanParameter, true, "Boolean");
-                        InstantiateParameter(ref refs.rightOperand, ParameterType.BooleanParameter, false, "Boolean");
-                        refs.parentesesInstance.GetComponent<RectTransform>().SetAsFirstSibling();
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(refs.rootParameter.GetComponent<RectTransform>());
-                        break; // adicionar dois prefab boolean (como first e last) (irmaos de genericParameter)
-                    case ParameterSections.BoolAllComparisonOperations:
-                        refs.parentesesInstance.SetActive(true);
-                        InstantiateParameter(ref refs.leftOperand, ParameterType.AllTypeParameter, true, "All Types");
-                        InstantiateParameter(ref refs.rightOperand, ParameterType.AllTypeParameter, false, "All Types");
-                        refs.parentesesInstance.GetComponent<RectTransform>().SetAsFirstSibling();
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(refs.rootParameter.GetComponent<RectTransform>());
-                        break; // adicionar dois prefab com todas as seções (como first e last) (irmaos de genericParameter)
-                    case ParameterSections.IntOperations: // adicionar dois prefabs param int (como first e last) (irmaos de genericParameter)
-                    case ParameterSections.BoolIntComparisonOperations:
-                        refs.parentesesInstance.SetActive(true);
-                        InstantiateParameter(ref refs.leftOperand, ParameterType.IntParameter, true, "Int");
-                        InstantiateParameter(ref refs.rightOperand, ParameterType.IntParameter, false, "Int");
-                        refs.parentesesInstance.transform.SetAsFirstSibling();
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(refs.rootParameter.GetComponent<RectTransform>());
-                        break; // adicionar dois prefabs param int, um como first e outro como last (irmaos de genericParameter)
-                    default:
-                        Debug.Log("Deu erro ao pressionar valor, parece que tem opção de seção a mais no Setup(ParameterSections) do que no Config(ValuePressionado");
-                        break;
-                } 
+                ConfigureOperands(valuePressed.sectionCurrent, valuePressed.value);
             }
 
             if (refs.variableManager.variables.ContainsKey(valueText)) {
@@ -101,6 +80,66 @@ public class ParameterConfig : MonoBehaviour
             UpdateSelectedValue(valuePressed);
         }
         blocker.Reset();
+    }
+
+    private bool IsUnaryOperation(string operation) {
+        return operation == "NÃO";
+    }
+
+    private bool NeedsOperandRebuild(ParameterSections section, string operation) {
+        if (section != ParameterSections.BoolLogicOperations) return false;
+
+        if (IsUnaryOperation(operation)) {
+            return refs.leftOperand != null || refs.rightOperand == null;
+        }
+
+        return refs.leftOperand == null || refs.rightOperand == null;
+    }
+
+    private void SetUnarySpacerActive(bool isActive) {
+        if (refs.unarySpacer != null) {
+            refs.unarySpacer.SetActive(isActive);
+        }
+    }
+
+    private void ConfigureOperands(ParameterSections section, string operation) {
+        switch (section) {
+            case ParameterSections.BoolLogicOperations:
+                SetUnarySpacerActive(IsUnaryOperation(operation));
+                refs.parentesesInstance.SetActive(true);
+                if (IsUnaryOperation(operation)) {
+                    InstantiateParameter(ref refs.rightOperand, ParameterType.BooleanParameter, false, "Boolean");
+                } else {
+                    InstantiateParameter(ref refs.leftOperand, ParameterType.BooleanParameter, true, "Boolean");
+                    InstantiateParameter(ref refs.rightOperand, ParameterType.BooleanParameter, false, "Boolean");
+                }
+                refs.parentesesInstance.transform.SetAsFirstSibling();
+                break;
+            case ParameterSections.BoolAllComparisonOperations:
+                refs.parentesesInstance.SetActive(true);
+                InstantiateParameter(ref refs.leftOperand, ParameterType.AllTypeParameter, true, "All Types");
+                InstantiateParameter(ref refs.rightOperand, ParameterType.AllTypeParameter, false, "All Types");
+                refs.parentesesInstance.transform.SetAsFirstSibling();
+                break;
+            case ParameterSections.IntOperations:
+            case ParameterSections.BoolIntComparisonOperations:
+                refs.parentesesInstance.SetActive(true);
+                InstantiateParameter(ref refs.leftOperand, ParameterType.IntParameter, true, "Int");
+                InstantiateParameter(ref refs.rightOperand, ParameterType.IntParameter, false, "Int");
+                refs.parentesesInstance.transform.SetAsFirstSibling();
+                break;
+            case ParameterSections.BoolValues:
+            case ParameterSections.DirectionValues:
+            case ParameterSections.MaterialValues:
+            case ParameterSections.IntValues:
+                SetUnarySpacerActive(false);
+                break;
+            default:
+                Debug.Log("Deu erro ao pressionar valor, parece que tem opção de seção a mais no Setup(ParameterSections) do que no Config(ValuePressionado");
+                break;
+        }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(refs.rootParameter.GetComponent<RectTransform>());
     }
 
     public void InstantiateParameter(ref ReferenceHolder instanceReference, ParameterType type, bool isFirst, string label)
@@ -141,6 +180,7 @@ public class ParameterConfig : MonoBehaviour
         refs.selectedSection = null;
         refs.selectedValueVisual = null;
         refs.selectedValueKey = null;
+        refs.selectedValueSection = ParameterSections.BoolValues;
         refs.selectedVariableName = null;
         if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
 
@@ -186,6 +226,19 @@ public class ParameterConfig : MonoBehaviour
 
         if (valueToSelect == null) return;
 
+        bool hasLogicalOperation = savedSection == ParameterSections.BoolLogicOperations;
+        bool mustRebuildLogicalOperation = hasLogicalOperation
+            && NeedsOperandRebuild(savedSection, selectedValue);
+
+        if (mustRebuildLogicalOperation) {
+            ResetParameterState();
+            ConfigureOperands(savedSection, selectedValue);
+            UpdateSelectedSection(sectionToSelect);
+        } else if (hasLogicalOperation) {
+            SetUnarySpacerActive(IsUnaryOperation(selectedValue));
+            refs.parentesesInstance.SetActive(true);
+        }
+
         UpdateSelectedValue(valueToSelect);
         refs.selectedVariableName = savedVariableName;
         refs.placeholderLabel.text = valueToSelect.label.text;
@@ -222,12 +275,14 @@ public class ParameterConfig : MonoBehaviour
     public void ResetParameterState() { // chamar cleanup no refs.blocksFactory
         if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
         refs.parentesesInstance.SetActive(false);
+        SetUnarySpacerActive(false);
 
         if (refs.selectedSection != null) refs.selectedSection.checkmark.enabled = false;
         if (refs.selectedValueVisual != null) refs.selectedValueVisual.checkmark.enabled = false;
 
         refs.selectedValueVisual = null;
         refs.selectedValueKey = null;
+        refs.selectedValueSection = ParameterSections.BoolValues;
 
         if (refs.leftOperand != null) {
             refs.blocksFactory.CleanUpParameter(refs.leftOperand);

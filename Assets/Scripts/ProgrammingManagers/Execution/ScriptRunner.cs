@@ -37,7 +37,9 @@ namespace ScriptRunner
 
         public object GetValue(ExecutionContext context)
         {
-            return _compiledOp(_left.GetValue(context), _right.GetValue(context));
+            object leftValue = _left != null ? _left.GetValue(context) : null;
+            object rightValue = _right != null ? _right.GetValue(context) : null;
+            return _compiledOp(leftValue, rightValue);
         }
     }
 
@@ -249,6 +251,17 @@ namespace ScriptRunner
             if (id < 0 || id >= _paramCache.Length || _paramCache[id] == null) return null;
 
             var paramNode = _paramCache[id];
+            if (paramNode.value == "NÃO")
+            {
+                if (paramNode.rightOperandId < 0 || paramNode.leftOperandId >= 0)
+                {
+                    throw new Exception("Estrutura inválida para a operação NÃO.");
+                }
+
+                IValueProvider right = ResolveValue(paramNode.rightOperandId);
+                return new OperationValue(null, right, (_, value) => !(bool)value);
+            }
+
             if (paramNode.leftOperandId >= 0 && paramNode.rightOperandId >= 0)
             {
                 IValueProvider left = ResolveValue(paramNode.leftOperandId);
@@ -267,7 +280,6 @@ namespace ScriptRunner
                     "/"   => (l, r) =>  (int) l /  (int)  r,//divisão por 0???? (impede aqui ou no digitar? acho melhor aqui na execução)
                     "E"   => (l, r) => (bool) l && (bool) r,
                     "OU"  => (l, r) => (bool) l || (bool) r,
-                  //"NÃO" => (l, r) => (bool) !l,             // tem que por essa opção ainda
                     _ => throw new Exception($"Operador inválido: {paramNode.value}")
                 };
 

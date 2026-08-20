@@ -239,6 +239,7 @@ public class BlocksFactory : MonoBehaviour
 
         if (paramRefs.inputTextInstance != null) Destroy(paramRefs.inputTextInstance);
         paramRefs.parentesesInstance.SetActive(false);
+        if (paramRefs.unarySpacer != null) paramRefs.unarySpacer.SetActive(false);
 
         // reiterar os values e sections pra dar cleanup
         // ACHAR JEITO MELHOR DO QUE FICAR DANDO GET COMPONENT
@@ -255,6 +256,7 @@ public class BlocksFactory : MonoBehaviour
         paramRefs.selectedSection = null;
         paramRefs.selectedValueVisual = null;
         paramRefs.selectedValueKey = null;
+        paramRefs.selectedValueSection = ParameterSections.BoolValues;
         paramRefs.selectedVariableName = null;
 
         if (paramRefs.leftOperand is ReferenceHolder leftOperand) {
