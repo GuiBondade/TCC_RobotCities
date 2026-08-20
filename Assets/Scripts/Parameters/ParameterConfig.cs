@@ -79,9 +79,14 @@ public class ParameterConfig : MonoBehaviour
 
             if (refs.variableManager.variables.ContainsKey(valueText)) {
                 refs.selectedVariableName = valueText;
-            } else if (valuePressed.sectionCurrent == ParameterSections.IntValues) {
-                if (valuePressed.value == GetComponent<ParameterSetup>().GetValueAt(ParameterSections.IntValues, 0)) refs.inputTextInstance.SetActive(true);
-                else refs.inputTextInstance.SetActive(false);
+                if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
+            } else {
+                refs.selectedVariableName = null;
+                if (refs.inputTextInstance != null) {
+                    bool isInputValue = valuePressed.sectionCurrent == ParameterSections.IntValues
+                        && valuePressed.value == GetComponent<ParameterSetup>().GetValueAt(ParameterSections.IntValues, 0);
+                    refs.inputTextInstance.SetActive(isInputValue);
+                }
             }
             Transform atual = transform.parent; // Começa do pai direto
             while (atual != null) {
@@ -123,6 +128,74 @@ public class ParameterConfig : MonoBehaviour
         valuePressed.checkmark.enabled = true;
     }
 
+    public void RestoreState(string savedValue, string savedVariableName, ParameterSections savedSection) {
+        for (int i = 0; i < refs.sectionContent.transform.childCount; i++) {
+            var section = refs.sectionContent.transform.GetChild(i).GetComponent<SectionInfo>();
+            if (section != null && section.checkmark != null) section.checkmark.enabled = false;
+        }
+        for (int i = 0; i < refs.valueContent.transform.childCount; i++) {
+            var value = refs.valueContent.transform.GetChild(i).GetComponent<ValueInfo>();
+            if (value != null && value.checkmark != null) value.checkmark.enabled = false;
+        }
+
+        refs.selectedSection = null;
+        refs.selectedValueVisual = null;
+        refs.selectedValueKey = null;
+        refs.selectedVariableName = null;
+        if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
+
+        SectionInfo sectionToSelect = null;
+        for (int i = 0; i < refs.sectionContent.transform.childCount; i++) {
+            var section = refs.sectionContent.transform.GetChild(i).GetComponent<SectionInfo>();
+            if (section != null && section.sectionCurrent == savedSection) {
+                sectionToSelect = section;
+                break;
+            }
+        }
+
+        if (sectionToSelect == null && refs.sectionContent.transform.childCount > 0) {
+            sectionToSelect = refs.sectionContent.transform.GetChild(0).GetComponent<SectionInfo>();
+        }
+
+        if (sectionToSelect == null) return;
+
+        UpdateValues(sectionToSelect);
+        UpdateSelectedSection(sectionToSelect);
+
+        string selectedValue = string.IsNullOrEmpty(savedVariableName) ? savedValue : savedVariableName;
+        bool isTypedInt = string.IsNullOrEmpty(savedVariableName)
+            && sectionToSelect.sectionCurrent == ParameterSections.IntValues
+            && int.TryParse(savedValue, out _);
+
+        if (isTypedInt) {
+            selectedValue = GetComponent<ParameterSetup>().GetValueAt(ParameterSections.IntValues, 0);
+            if (refs.inputTextInstance != null) {
+                refs.inputTextInstance.GetComponent<TMP_InputField>().text = savedValue;
+                refs.inputTextInstance.SetActive(true);
+            }
+        }
+
+        ValueInfo valueToSelect = null;
+        for (int i = 0; i < refs.valueContent.transform.childCount; i++) {
+            var value = refs.valueContent.transform.GetChild(i).GetComponent<ValueInfo>();
+            if (value != null && value.value == selectedValue) {
+                valueToSelect = value;
+                break;
+            }
+        }
+
+        if (valueToSelect == null) return;
+
+        UpdateSelectedValue(valueToSelect);
+        refs.selectedVariableName = savedVariableName;
+        refs.placeholderLabel.text = valueToSelect.label.text;
+        refs.placeholderLabel.ForceMeshUpdate();
+
+        if (!isTypedInt && refs.inputTextInstance != null) {
+            refs.inputTextInstance.SetActive(false);
+        }
+    }
+
     public void UpdateValues(SectionInfo sectionInfo) { //operations / values
         for (int i = refs.valueContent.transform.childCount - 1; i >= 0; i--)
         {
@@ -150,7 +223,7 @@ public class ParameterConfig : MonoBehaviour
         if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
         refs.parentesesInstance.SetActive(false);
 
-        refs.selectedSection.checkmark.enabled = false;
+        if (refs.selectedSection != null) refs.selectedSection.checkmark.enabled = false;
         if (refs.selectedValueVisual != null) refs.selectedValueVisual.checkmark.enabled = false;
 
         refs.selectedValueVisual = null;

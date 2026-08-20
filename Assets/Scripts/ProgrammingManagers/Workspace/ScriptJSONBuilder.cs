@@ -38,9 +38,10 @@ public class ScriptJSONBuilder : MonoBehaviour
     }
 
     public void BuildBlocksFromData(SaveNodesData data) {
-        if (data == null) return;
-        
+        blocksFactory.CleanUpWorkspace(workspace);
         VariableManager.instancia.Clear(); 
+        
+        if (data == null) return;
         
         foreach(var varNode in data.variaveisData){
             CreateVariableUI visualVar = blocksFactory.InitializeCreateVariable(workspace, false);
@@ -146,6 +147,11 @@ public class ScriptJSONBuilder : MonoBehaviour
             var rightOperand = InstantiateParameter(paramNode.rightOperandId, paramRect);//arrumar algo?
             paramReference.rightOperand = rightOperand;
             rightOperand.transform.SetAsLastSibling();
+        }
+
+        var parameterConfig = paramReference.GetComponent<ParameterConfig>();
+        if (parameterConfig != null) {
+            parameterConfig.RestoreState(paramNode.value, paramNode.varName, paramNode.selectedSection);
         }
 
         return paramReference;

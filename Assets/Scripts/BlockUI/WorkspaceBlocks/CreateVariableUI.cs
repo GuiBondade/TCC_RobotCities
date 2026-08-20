@@ -129,6 +129,8 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
     }
 
     public void OnDefaultValueDropdownSelect(int index) {
+        if (defaultValueDropdown == null || index < 0 || index >= defaultValueDropdown.options.Count) return;
+
         var text = defaultValueDropdown.options[index].text;
         Debug.Log("alterou value de create variable para: " + text);
         variableManager.UpdateVariableData(variableName, null, null, text);

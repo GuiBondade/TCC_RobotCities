@@ -187,6 +187,28 @@ public class BlocksFactory : MonoBehaviour
         }
     }
 
+    public void CleanUpWorkspace(Transform workspace) {
+        if (workspace == null) return;
+
+        var roots = new List<Transform>();
+        foreach (Transform child in workspace) {
+            roots.Add(child);
+        }
+
+        foreach (Transform root in roots) {
+            if (root.TryGetComponent<CreateVariableUI>(out var createVariable)) {
+                CleanUpBlockWorkspace(createVariable);
+            } else if (root.TryGetComponent<BlockUI>(out var blockLine)) {
+                CleanUpBlockLine(blockLine);
+            }
+
+            // Quando LineStartUI tiver linha própria e pool, adicionar aqui:
+            // else if (root.TryGetComponent<LineStartUI>(out var lineStart)) {
+            //     CleanUpLineStart(lineStart);
+            // }
+        }
+    }
+
     // Functions Parameter
     public ReferenceHolder InitializeParameter(string paramName, ParameterType type, Transform parent) { // passar data de parametro? pra dar setup ja (setup do parameter setup?, parameternode?)
         var paramRefs = pools.GetParameter();
@@ -265,6 +287,7 @@ public class BlocksFactory : MonoBehaviour
     }
 
     public void CleanUpSection(SectionInfo sectionInfo) {
+        sectionInfo.checkmark.enabled = false;
         sectionInfo.btn.onClick.RemoveAllListeners();
         sectionInfo.valueList.Clear();
         pools.ReleaseSection(sectionInfo);

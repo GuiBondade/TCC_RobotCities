@@ -84,12 +84,13 @@ public class VariableManager : MonoBehaviour
     public void UpdateVariableData(string name, ParameterType? type, ParameterSections? section, string defaultValue) {
         if (!variables.ContainsKey(name)) {
             name = CreateVariable(name);
-            Debug.Log("variável criada ao atualizar dados: " + name);
-        } else {
-            if (type == null) type = variables[name].type;
-            if (section == null) section = variables[name].section;
-            if (defaultValue == null) defaultValue = variables[name].defaultValue;
         }
+
+        var currentInfo = variables[name];
+        type ??= currentInfo.type;
+        section ??= currentInfo.section;
+        defaultValue ??= currentInfo.defaultValue;
+
         var varInfo = new VariableInfo();
         varInfo.type = type.Value;
         varInfo.section = section.Value;

@@ -32,12 +32,8 @@ public class WorkspaceBuilder : MonoBehaviour
     public SaveNodesData WorkspaceBuildGraph(SaveNodesData nodes) {
         paramIdMap.Clear();
         blockIdMap.Clear();
-        if (nodes == null) nodesData = new SaveNodesData();
-        else {
-            nodesData.blocosData.Clear();
-            nodesData.parametrosData.Clear();
-            nodesData.variaveisData.Clear();
-        }
+        nodesData = nodes ?? new SaveNodesData();
+        nodesData.Clear();
         paramIdCounter = 0;
         blockIdCounter = 0;
 
@@ -102,6 +98,9 @@ public class WorkspaceBuilder : MonoBehaviour
             type = typeParameter,
             value = valor,
             varName = variableName,
+            selectedSection = parameter.selectedSection != null
+                ? parameter.selectedSection.sectionCurrent
+                : parameter.selectedValueSection,
             leftOperandId = -1,
             rightOperandId = -1
         };

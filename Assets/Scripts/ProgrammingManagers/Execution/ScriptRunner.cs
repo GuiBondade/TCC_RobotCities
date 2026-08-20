@@ -256,13 +256,18 @@ namespace ScriptRunner
 
                 Func<object, object, object> opDelegate = paramNode.value switch
                 {
-                    "==" => (l, r) =>  Equals(l, r),
-                    "<=" => (l, r) =>  (int)l <= (int)r,
-                    "<" => (l, r) =>   (int)l <  (int)r,
-                    ">=" => (l, r) =>  (int)l >= (int)r,
-                    ">" => (l, r) =>   (int)l >  (int)r,
-                    "+" => (l, r) =>   (int)l +  (int)r,
-                    "-" => (l, r) =>   (int)l -  (int)r,
+                    "=="  => (l, r) =>  Equals(l, r),
+                    "<="  => (l, r) =>  (int) l <= (int)  r,
+                    "<"   => (l, r) =>  (int) l <  (int)  r,
+                    ">="  => (l, r) =>  (int) l >= (int)  r,
+                    ">"   => (l, r) =>  (int) l >  (int)  r,
+                    "+"   => (l, r) =>  (int) l +  (int)  r,
+                    "-"   => (l, r) =>  (int) l -  (int)  r,
+                    "*"   => (l, r) =>  (int) l *  (int)  r,
+                    "/"   => (l, r) =>  (int) l /  (int)  r,//divisão por 0???? (impede aqui ou no digitar? acho melhor aqui na execução)
+                    "E"   => (l, r) => (bool) l && (bool) r,
+                    "OU"  => (l, r) => (bool) l || (bool) r,
+                  //"NÃO" => (l, r) => (bool) !l,             // tem que por essa opção ainda
                     _ => throw new Exception($"Operador inválido: {paramNode.value}")
                 };
 
