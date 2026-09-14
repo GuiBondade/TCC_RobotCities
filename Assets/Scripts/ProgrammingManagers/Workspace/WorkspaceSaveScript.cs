@@ -1,15 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
-
-using System;
-using System.Linq;
-
 // chama o WorkspaceJSON (LOAD)
-public class WorkspaceBuilder : MonoBehaviour
+public class WorkspaceSaveScript : MonoBehaviour
 {
     private Dictionary<BlockUI, int> blockIdMap = new();
     private Dictionary<ReferenceHolder, int> paramIdMap = new();
@@ -18,27 +12,28 @@ public class WorkspaceBuilder : MonoBehaviour
     private int paramIdCounter = 0;
     private int blockRootId = 0;
 
-    public RectTransform workspace;
+    [SerializeField] private RectTransform contentWorkspace;
+    [SerializeField] private ScriptManager scriptManager;
+    [SerializeField] private SectionDatabase sectionDatabase;
 
-    public SectionDatabase sectionDatabase;
     private string inputIntValueName;
 
     void Start() {
-        workspace = CanvasAreasManager.instancia.contentWorkspace;
+        InterfaceWorkspace.instancia.OnScriptSaved += WorkspaceBuildGraph;
 
         inputIntValueName = sectionDatabase.GetValuesForSection(ParameterSections.IntValues)[0];
     }
 
-    public SaveNodesData WorkspaceBuildGraph(SaveNodesData nodes) {
+    public void WorkspaceBuildGraph() {
         paramIdMap.Clear();
         blockIdMap.Clear();
-        nodesData = nodes ?? new SaveNodesData();
+        nodesData = scriptManager.scriptOnFocus.nodes ?? new SaveNodesData();
         nodesData.Clear();
         paramIdCounter = 0;
         blockIdCounter = 0;
 
         // pega todos blocos no workspace (nível raiz)
-        foreach (Transform child in workspace) {
+        foreach (Transform child in contentWorkspace) {
             var block = child.GetComponent<BlockUI>();
             if (block != null) {
                 Traverse(block, true);
@@ -62,7 +57,7 @@ public class WorkspaceBuilder : MonoBehaviour
             Debug.Log(parametro.id);
         }
         
-        return nodesData;
+        scriptManager.SaveScript(nodesData);
     }
 
     private bool TryGetParameterNode(ReferenceHolder parameter, out int id) {

@@ -36,17 +36,15 @@ public class DraggableBlockLine : DraggableBlockGeneric
         base.AttachBlockToMouse();
     }
 
-    public override void AttachBlockToWorkspace(PointerEventData eventData) { // da pra especificar os parametros, pra tipo, eventdata.position
-        // Se estiver sobre um BlockSlot, coloca como filho dele
-        var placeDropped = eventData.pointerEnter?.transform;
-        if (placeDropped != null && placeDropped != canvasAreasManager.contentWorkspace)
+    public override void AttachBlockToWorkspace(PointerEventData eventData) 
+    {
+        if (!RectTransformUtility.RectangleContainsScreenPoint(canvasAreasManager.visibleWorkspace, eventData.position, eventData.pressEventCamera)) 
         {
-            Debug.Log("dropou em bloco");
-            BlockSlot slot = BlockUIUtils.GetBlockSlotByEventData(eventData); 
-            if (slot != null) blocksFactory.ConnectToSlot(blockUI, false, slot.transform);
-        } else {
-            Debug.Log("dropou em workspace");
-            blocksFactory.ConnectToSlot(blockUI, true, canvasAreasManager.contentWorkspace);
+            blocksFactory.CleanUpBlockLine(blockUI);
+        }
+        else 
+        {
+            BlockUIUtils.AttachToSlotOrWorkspace(blockUI, eventData, blocksFactory, canvasAreasManager);
         }
     }
 

@@ -87,23 +87,15 @@ public class PaletteItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     }
 
     protected virtual void HandleBlockDrop(PointerEventData eventData) {
-        // Se liberou fora da workspace, descarta; caso contrário mantém
-        if (!RectTransformUtility.RectangleContainsScreenPoint(canvasAreasManager.visibleWorkspace, eventData.position, eventData.pressEventCamera)) {
+        if (!RectTransformUtility.RectangleContainsScreenPoint(canvasAreasManager.visibleWorkspace, eventData.position, eventData.pressEventCamera)) 
+        {
             blocksFactory.CleanUpBlockLine(ui);
         }
-        else {
-            // Se estiver sobre um BlockSlot, coloca como filho dele
-            var placeDropped = eventData.pointerEnter?.transform;
-            if (placeDropped != null && placeDropped != canvasAreasManager.contentWorkspace)
-            {
-                Debug.Log("dropou em bloco");
-                BlockSlot slot = BlockUIUtils.GetBlockSlotByEventData(eventData); 
-                if (slot != null) blocksFactory.ConnectToSlot(ui, false, slot.transform);
-            } else {
-                Debug.Log("dropou em workspace");
-                blocksFactory.ConnectToSlot(ui, true, canvasAreasManager.contentWorkspace);
-            }
+        else 
+        {
+            BlockUIUtils.AttachToSlotOrWorkspace(ui, eventData, blocksFactory, canvasAreasManager);
         }
+
         ui = null;
     }
 }

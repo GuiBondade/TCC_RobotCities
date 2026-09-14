@@ -11,28 +11,37 @@ public class ScriptSpawner : MonoBehaviour
 
     private int scriptCounter = 0;
 
+    public List<string> namesList = new List<string>();
+    private string newScriptName;
+
     void Start() {
         ScriptSignals.OnDeleteInterfaceAccepted += DeleteScript;
+        
         AddScript();
     }
 
     public void AddScript() {
-        string name = defaultName;// função de não repetir nome (talvez reusar o de variavel, so que ter que passar lista tambem)
         var scriptAdded = new ScriptData() {
             id = scriptCounter,
-            name = defaultName,
         };
         ScriptSignals.TriggerScriptCreation(scriptAdded);
         scriptCounter++;
         var scriptInterface = Instantiate(scriptUIPrefab, scriptContainer);
-        scriptInterface.Setup(scriptManager, scriptAdded);
+        scriptInterface.Setup(scriptManager, scriptAdded, this, defaultName);
     } 
 
     public void DeleteScript(GameObject scriptGO, ScriptData scriptData) {
-        if (scriptManager.scripts.Count <= 1) {
-            AddScript();
-        }
+        namesList.Remove(scriptData.name);
         scriptManager.DeleteScript(scriptData);
         Destroy(scriptGO);
+        if (scriptManager.scripts.Count < 1) {
+            AddScript();
+        }
+    }
+
+    public string RegisterNewName(string name) {
+        newScriptName = StringUtils.EnsureUniqueString(name, namesList, defaultName);
+        namesList.Add(newScriptName);
+        return newScriptName;
     }
 }

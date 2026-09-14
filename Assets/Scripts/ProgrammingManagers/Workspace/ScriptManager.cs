@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using System;
 using System.Collections.Generic;
 
 using ScriptRunner;
@@ -23,11 +23,14 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
 {
     public static ScriptManager instancia { get; private set; }
 
-    public WorkspaceBuilder graphBuilder;
-    public ScriptJSONBuilder jsonBuilder;
+    [SerializeField] private ScriptSaveJSON jsonBuilder;
 
-    private ScriptData scriptOnFocus;
+    public ScriptData scriptOnFocus;
     public List<ScriptData> scripts = new List<ScriptData>();
+
+    public event Action<SaveNodesData> OnScriptOpen; 
+    public event Action OnScriptClosed; 
+    public event Action<string> ScriptInterfaceStateChanged; 
     
     void Awake() {
         if (instancia == null) instancia = this;
@@ -35,37 +38,30 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
             Debug.Log("Duplicata desnecessária de ScriptManager destruída");
             Destroy(gameObject);
         }
-    }
-
-    void Start() {
-        instancia = this;
 
         ScriptSignals.OnCreateScript += CreateScript;
     }
 
-    public void TestGraph() // save (set)
+    private void OnDestroy()
+    {
+        ScriptSignals.OnCreateScript -= CreateScript;
+    }
+
+    public void SaveScript(SaveNodesData data) // save (set)
     {
         Debug.Log("salvando script: " + scriptOnFocus.id);
-        scriptOnFocus.nodes = graphBuilder.WorkspaceBuildGraph(scriptOnFocus.nodes);
+        scriptOnFocus.nodes = data;
         jsonBuilder.SaveAsJson(scriptOnFocus.nodes, scriptOnFocus.id.ToString());
+        Compile(scriptOnFocus);
+    }
 
-        foreach (var p in scriptOnFocus.nodes.parametrosData)
-        {
-            Debug.Log($"Parameter {p.id} - {p.type} | Value: {p.value} | LeftOperand: {p.leftOperandId} | RightOperand: {p.rightOperandId}");
-        }
-        foreach (var b in scriptOnFocus.nodes.blocosData) // le de tras pra frente, pois salva de tras pra frente
-        {
-            Debug.Log($"Block {b.id} | BlockDataId {b.functionId} | ParamIds: {string.Join(", ", b.paramIds)} | Next: {b.next} | Body: {b.body}");
-        }
-
-        Debug.Log("Compilando");
-        
+    private void Compile(ScriptData script) {
         BlockCompiler compiler = new BlockCompiler();
-        ExecutionBlock root = compiler.Compile(scriptOnFocus.nodes, 0/* esse 0 ta bem errado, tem que ser o id do primeiro */);// tem que considerar uma lista de primeiros blocos
+        ExecutionBlock root = compiler.Compile(script.nodes, 0/* esse 0 ta bem errado, tem que ser o id do primeiro */);// tem que considerar uma lista de primeiros blocos
         List<ExecutionBlock> roots = new List<ExecutionBlock>();
         roots.Add(root);
         List<VariableData> varList = new List<VariableData>();
-        foreach(CreateVarNode var in scriptOnFocus.nodes.variaveisData) {
+        foreach(CreateVarNode var in script.nodes.variaveisData) {
             varList.Add(new VariableData(){
                 varName = var.varName,
                 defaultValue = var.defaultValue
@@ -73,23 +69,27 @@ public class ScriptManager : MonoBehaviour // arquivo set/delete json
             );
         } 
 
-        scriptOnFocus.functionsRoot = roots;
-        scriptOnFocus.vars = varList;
+        script.functionsRoot = roots;
+        script.vars = varList;
     }
 
     public void OpenScript(ScriptData script)
     {
-        Debug.Log("Build blocks from script: " + script.id);
-        SaveNodesData nodes = script.nodes;
-        //dar clear dos blocos na workspace
-        // talvez iterar sobre os filhos diretos da content Workspace e da blocksFactory.CleanUpBlock()
-        jsonBuilder.BuildBlocksFromData(nodes);
+        Debug.Log("Build blocks from script: " + script?.id);
+        SaveNodesData nodes = null;
+        if (script != null) nodes = script.nodes;
+        OnScriptOpen?.Invoke(nodes);
+        ChangeInterfaceScriptName(script?.name);
         scriptOnFocus = script;
+    }
+
+    public void ChangeInterfaceScriptName(string name) {
+        ScriptInterfaceStateChanged?.Invoke(name);
     }
 
     public void DeleteScript(ScriptData script)
     {
-        // if (script == scriptOnFocus) blocksFactory.CleanUpWorkspace();
+        if (script == scriptOnFocus) OnScriptClosed?.Invoke();
         scripts.Remove(script);
         jsonBuilder.DeleteJson(script.id.ToString());
     }

@@ -9,7 +9,6 @@ public class VariableManager : MonoBehaviour
 
     public static VariableManager instancia { get; private set; }
 
-    private int varCopyCounter = 0;
     public string defaultVarFirstOption;
     public string defaultVarName;
 
@@ -47,24 +46,9 @@ public class VariableManager : MonoBehaviour
     } 
 
     public string CreateVariable(string name) {
-        string formattedName = name.Trim();
-
-        if (string.IsNullOrEmpty(formattedName))
-        {
-            formattedName = defaultVarName; // newVar
-        }
-
-        string finalName = formattedName;
-        varCopyCounter = 2; 
-
-        while (variables.ContainsKey(finalName))
-        {
-            finalName = $"{formattedName} ({varCopyCounter})";
-            varCopyCounter++;
-        }
+        string finalName = StringUtils.EnsureUniqueString(name, variables.Keys, defaultVarName);
 
         variables[finalName] = new VariableInfo();
-        Debug.Log(variables[finalName].type.ToString());
         return finalName;
     }
 

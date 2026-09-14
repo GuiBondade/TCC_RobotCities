@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class RobotTriggerInterface : MonoBehaviour
 {
-    public RobotScript robotScript;
+    [SerializeField] private RobotScript robotScript;
+    private Vector2 mousePosition;
 
     public void OnMouseDown() {
-        RobotSignals.TriggerInterfaceOpen(robotScript);
+        mousePosition = Input.mousePosition;
+        RobotSignals.TriggerInterfaceOpen(robotScript, mousePosition); 
         Debug.Log("interface open");
     }
 }

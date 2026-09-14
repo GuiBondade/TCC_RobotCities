@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ZoomScrollWorkspace : MonoBehaviour, IScrollHandler
 {
-    // FEITO TOTALMENTE POR IA
     [Header("Alvo do Zoom e Movimento")]
     [SerializeField] private RectTransform conteudoTransform;
 
@@ -15,7 +15,10 @@ public class ZoomScrollWorkspace : MonoBehaviour, IScrollHandler
     [Header("Configurações de Zoom")]
     [SerializeField] private float zoomSpeed = 0.1f;
     [SerializeField] private float maxScale = 3f;
-    // O minScale fixo foi removido pois agora ele é calculado dinamicamente
+
+    [Header("Botões de Zoom")]
+    [SerializeField] private Button btnZoomIn;
+    [SerializeField] private Button btnZoomOut;
 
     [HideInInspector] public RectTransform blockInDrag;
 
@@ -30,11 +33,34 @@ public class ZoomScrollWorkspace : MonoBehaviour, IScrollHandler
         }
 
         blockInDrag = null;
+
+        if (btnZoomIn != null) btnZoomIn.onClick.AddListener(ZoomIn);
+        if (btnZoomOut != null) btnZoomOut.onClick.AddListener(ZoomOut);
+    }
+
+    void Start()
+    {
+        AtualizarEstadoBotoes();
     }
 
     void Update()
     {
         HandleRightClickDrag();
+    }
+
+    // Chame este método apenas quando alterar o tamanho do painel (ex: no evento do Toggle de Fullscreen)
+    public void RecalculateBounds()
+    {
+        if (conteudoTransform == null || paiTransform == null) return;
+
+        float minScale = CalcularMinScale();
+        if (conteudoTransform.localScale.x < minScale)
+        {
+            conteudoTransform.localScale = new Vector3(minScale, minScale, 1f);
+        }
+
+        conteudoTransform.localPosition = ClampPosition(conteudoTransform.localPosition);
+        AtualizarEstadoBotoes();
     }
 
     private void HandleRightClickDrag()
@@ -45,7 +71,6 @@ public class ZoomScrollWorkspace : MonoBehaviour, IScrollHandler
             {
                 isDragging = true;
                 lastMousePosition = Input.mousePosition;
-                //if (BlockerManager.instancia != null) BlockerManager.instancia.Reset();
             }
         }
 
@@ -70,49 +95,78 @@ public class ZoomScrollWorkspace : MonoBehaviour, IScrollHandler
     {
         if (conteudoTransform == null) return;
 
-        //if (BlockerManager.instancia != null) BlockerManager.instancia.Reset();
-
-        Vector3 currentScale = conteudoTransform.localScale;
         float zoomFactor = eventData.scrollDelta.y * zoomSpeed;
-        Vector3 targetScale = currentScale + new Vector3(zoomFactor, zoomFactor, 0);
+        AplicarZoom(zoomFactor, eventData.position, eventData.pressEventCamera);
+    }
 
-        // 1. Calcula o menor zoom permitido para que o filho NUNCA seja menor que o pai
-        float menorZoomPermitido = CalcularMinScale();
+    public void ZoomIn()
+    {
+        Vector2 centroTela = RectTransformUtility.WorldToScreenPoint(canvas.worldCamera, paiTransform.position);
+        AplicarZoom(zoomSpeed, centroTela, canvas.worldCamera);
+    }
 
-        // 2. Limita o zoom entre o mínimo dinâmico e o máximo fixo
-        targetScale.x = Mathf.Clamp(targetScale.x, menorZoomPermitido, maxScale);
-        targetScale.y = Mathf.Clamp(targetScale.y, menorZoomPermitido, maxScale);
+    public void ZoomOut()
+    {
+        Vector2 centroTela = RectTransformUtility.WorldToScreenPoint(canvas.worldCamera, paiTransform.position);
+        AplicarZoom(-zoomSpeed, centroTela, canvas.worldCamera);
+    }
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(conteudoTransform, eventData.position, eventData.pressEventCamera, out Vector2 localMouseBefore);
+    private void AplicarZoom(float deltaZoom, Vector2 posicaoPivo, Camera cam)
+    {
+        if (conteudoTransform == null) return;
 
+        float oldScale = conteudoTransform.localScale.x;
+        float minScale = CalcularMinScale();
+        float targetScaleValue = Mathf.Clamp(oldScale + deltaZoom, minScale, maxScale);
+
+        if (Mathf.Approximately(oldScale, targetScaleValue)) return;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(paiTransform, posicaoPivo, cam, out Vector2 mouseInParent);
+
+        Vector2 localPosAtual = conteudoTransform.localPosition;
+        Vector2 pontoNoFilho = (mouseInParent - localPosAtual) / oldScale;
+
+        Vector3 targetScale = new Vector3(targetScaleValue, targetScaleValue, 1f);
         conteudoTransform.localScale = targetScale;
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(conteudoTransform, eventData.position, eventData.pressEventCamera, out Vector2 localMouseAfter);
-
-        Vector3 difference = localMouseAfter - localMouseBefore;
-        Vector3 novaPosicao = conteudoTransform.localPosition + conteudoTransform.TransformDirection(difference);
-
+        Vector3 novaPosicao = mouseInParent - (pontoNoFilho * targetScaleValue);
         conteudoTransform.localPosition = ClampPosition(novaPosicao);
 
         if (blockInDrag) {
             AdjustBlockInDrag(blockInDrag, targetScale);
         }
+
+        AtualizarEstadoBotoes();
     }
 
-    // Calcula o zoom mínimo necessário para preencher todo o espaço do Pai
+    private void AtualizarEstadoBotoes()
+    {
+        if (conteudoTransform == null) return;
+
+        float menorZoomPermitido = CalcularMinScale();
+        float escAtual = conteudoTransform.localScale.x;
+
+        if (btnZoomIn != null)
+            btnZoomIn.interactable = escAtual < maxScale - 0.001f;
+
+        if (btnZoomOut != null)
+            btnZoomOut.interactable = escAtual > menorZoomPermitido + 0.001f;
+    }
+
     private float CalcularMinScale()
     {
         Vector2 tamanhoPai = paiTransform.rect.size;
         Vector2 tamanhoFilhoOriginal = conteudoTransform.rect.size;
 
-        // Descobre qual proporção (Largura ou Altura) precisa de mais zoom para cobrir o Pai
+        if (tamanhoFilhoOriginal.x == 0 || tamanhoFilhoOriginal.y == 0) return 1f;
+
         float scaleNecessarioParaLargura = tamanhoPai.x / tamanhoFilhoOriginal.x;
         float scaleNecessarioParaAltura = tamanhoPai.y / tamanhoFilhoOriginal.y;
 
-        // Retorna o maior valor entre os dois, garantindo cobertura total em ambos os eixos
         return Mathf.Max(scaleNecessarioParaLargura, scaleNecessarioParaAltura);
     }
 
+    // Cálculo exato para o Pai com Pivot X = 1, Y = 0.5 e Filho com Pivot X = 0.5, Y = 0.5
     private Vector3 ClampPosition(Vector3 posicaoAlvo)
     {
         Vector2 tamanhoPai = paiTransform.rect.size;
@@ -120,27 +174,24 @@ public class ZoomScrollWorkspace : MonoBehaviour, IScrollHandler
         float larguraFilhoEscalado = conteudoTransform.rect.width * conteudoTransform.localScale.x;
         float alturaFilhoEscalado = conteudoTransform.rect.height * conteudoTransform.localScale.y;
 
-        // Como o Filho agora é SEMPRE maior ou igual ao Pai, o limite impede que
-        // as bordas do Filho entrem para dentro da área visível do Pai.
-        float limiteX = (larguraFilhoEscalado - tamanhoPai.x) / 2f;
-        float limiteY = (alturaFilhoEscalado - tamanhoPai.y) / 2f;
+        // Limites horizontais para Pivot X = 1 no Pai
+        float minX = -larguraFilhoEscalado / 2f;
+        float maxX = -tamanhoPai.x + (larguraFilhoEscalado / 2f);
 
-        // Trava a posição para que o fundo nunca fique visível
-        float clampX = Mathf.Clamp(posicaoAlvo.x, -limiteX, limiteX);
-        float clampY = Mathf.Clamp(posicaoAlvo.y, -limiteY, limiteY);
+        // Limites verticais para Pivot Y = 0.5 no Pai
+        float minY = (tamanhoPai.y - alturaFilhoEscalado) / 2f;
+        float maxY = (alturaFilhoEscalado - tamanhoPai.y) / 2f;
+
+        float clampX = Mathf.Clamp(posicaoAlvo.x, minX, maxX);
+        float clampY = Mathf.Clamp(posicaoAlvo.y, minY, maxY);
 
         return new Vector3(clampX, clampY, posicaoAlvo.z);
     }
 
     public void AdjustBlockInDrag(RectTransform block, Vector3 targetScale) {
-        block.localScale = new Vector2(targetScale.x, targetScale.y);
-        // 1. A posição do mouse na tela é a posição global no Canvas Overlay
+        block.localScale = targetScale;
         Vector3 mouseWorldPos = Input.mousePosition;
-
-        // Z deve ser 0 para evitar problemas de profundidade em UI 2D
         mouseWorldPos.z = 0f; 
-
-        // 2. Aplica diretamente na posição GLOBAL do bloco (isso anula qualquer efeito de zoom/escala dos pais)
         block.transform.position = mouseWorldPos;
     }
 }

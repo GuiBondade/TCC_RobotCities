@@ -2,49 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
-
-
-using System;
 using System.Linq;
 
-public class ScriptJSONBuilder : MonoBehaviour
+public class WorkspaceLoadScript : MonoBehaviour
 {
     private BlockNode[] blocoDadosArray;
     private ParameterNode[] paramDadosArray;
 
     private int spaceBetweenBlocks = 0;
 
-    public BlockDatas blockDatas;
-    public BlocksFactory blocksFactory;
-    public RectTransform workspace;
+    [SerializeField] private BlockDatas blockDatas;
+    [SerializeField] private BlocksFactory blocksFactory;
+    [SerializeField] private RectTransform contentWorkspace;
+    [SerializeField] private GameObject visualWorkspace;
 
-    public void SaveAsJson(SaveNodesData nodes, string name){
-        // salvo em: C:\Users\<seu_usuario>\AppData\LocalLow\<CompanyName>[DefaultCompany*]\<ProductName>\workspace.json
-        string json = JsonUtility.ToJson(nodes, true); // true = readability (tira quando salvar de verdade)
-        var folder = Application.persistentDataPath;
-        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-        var path = Path.Combine(folder, $"{name}.json");
-        File.WriteAllText(path, json);
-    }
-
-    public void DeleteJson(string name) {
-        string filePath = Path.Combine(Application.persistentDataPath, name);
-        if (File.Exists(filePath)) {
-            File.Delete(filePath);
-        } else {
-            Debug.Log("Arquivo não encontrado: " + name);
-        }
+    void Start() {
+        ScriptManager.instancia.OnScriptOpen += BuildBlocksFromData;
     }
 
     public void BuildBlocksFromData(SaveNodesData data) {
-        blocksFactory.CleanUpWorkspace(workspace);
+        blocksFactory.CleanUpWorkspace(contentWorkspace);
         VariableManager.instancia.Clear(); 
         
         if (data == null) return;
+
+        visualWorkspace.SetActive(true);
         
         foreach(var varNode in data.variaveisData){
-            CreateVariableUI visualVar = blocksFactory.InitializeCreateVariable(workspace, false);
+            CreateVariableUI visualVar = blocksFactory.InitializeCreateVariable(contentWorkspace, false);
             visualVar.SetupWithData(varNode.varName, varNode.type, varNode.section, varNode.defaultValue);
             visualVar.GetComponent<RectTransform>().localPosition = varNode.position;
         }
@@ -67,21 +52,21 @@ public class ScriptJSONBuilder : MonoBehaviour
     public void BuildRoot(List<BlockNode> blocosData) { // DA PRA FAZER SER ACESSIVEL PELO PALLETE ITEM E DAI LA SER SO CHAMADA DE FUNÇÃO, AQUI TAMBÉM SERIA
         List<int> rootInstancedList = new List<int> ();
         
-        workspace.gameObject.SetActive(false);
+        contentWorkspace.gameObject.SetActive(false);
         foreach (var bloco in blocosData) {
             int rootBlockId = bloco.rootId; // pegar id bloco instanciado na workspace
             if (rootBlockId >= 0) {
                 if (!rootInstancedList.Contains(rootBlockId)) {// ver se esse id é de bloco ja instanciado
                     rootInstancedList.Add(rootBlockId); // se nao, instancia e adiciona na lista
                     spaceBetweenBlocks += 100;
-                    InstantiateBlock(rootBlockId, true, workspace); // workspace é ref
+                    InstantiateBlock(rootBlockId, true, contentWorkspace); // workspace é ref
                 }
                 spaceBetweenBlocks = 0;
             } else {
                 Debug.Log("rootId não settado");
             }
         }
-        workspace.gameObject.SetActive(true);
+        contentWorkspace.gameObject.SetActive(true);
         StartCoroutine(RebuildDepois());
     }
 
@@ -161,6 +146,6 @@ public class ScriptJSONBuilder : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(workspace);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentWorkspace);
     }
 }

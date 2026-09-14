@@ -25,4 +25,22 @@ public static class BlockUIUtils
         }
         return null;
     }
+
+    public static void AttachToSlotOrWorkspace(
+        BlockUI targetBlock, 
+        PointerEventData eventData, 
+        BlocksFactory blocksFactory, 
+        CanvasAreasManager canvasAreasManager)
+    {
+        BlockSlot slot = GetBlockSlotByEventData(eventData);
+
+        if (slot != null)
+        {
+            blocksFactory.ConnectToSlot(targetBlock, false, slot.transform);
+        }
+        else
+        {
+            blocksFactory.ConnectToSlot(targetBlock, true, canvasAreasManager.contentWorkspace);
+        }
+    }
 }
