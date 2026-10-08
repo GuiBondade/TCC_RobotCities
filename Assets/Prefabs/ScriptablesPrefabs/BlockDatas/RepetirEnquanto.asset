@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182b4c78af87056448953178db4fdeb7, type: 3}
   m_Name: RepetirEnquanto
   m_EditorClassIdentifier: 
-  id: repetir_enquanto
+  id: While
   blockName: Repetir Enquanto
   function: 0
   color: {r: 0, g: 0.9169811, b: 0.11357717, a: 1}
   prefab: 1
-  listaParametros: 0300000000000000
+  listaParametros: 00000000

@@ -16,7 +16,7 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
 
      */
     private float acumuladorTempo = 0f;
-    public float tickTime = 0.5f; // Ex: 100ms por tick
+    public float tickTime = 0.2f; // Ex: 100ms por tick
 
     private List<ExecutionContext> functionsInExecution = new List<ExecutionContext>(); 
     private List<ExecutionContext> functionsToRemove = new List<ExecutionContext>(); 
@@ -24,9 +24,7 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
     private void OnEnable() => RobotSignals.OnActivateExecution += ActivateExecution;
     private void OnDisable() => RobotSignals.OnDeactivateExecution -= DeactivateExecution;
 
-    public void ActivateExecution(RobotScript robot){
-        // o bloco identado é a criação de contexto que deve ser feita em outro script pra melhor arquitetura de código
-        // da pra por no executionManager no executionActivated, antes de adicionar na lista
+    public void ActivateExecution(RobotScript robot) {
         var context = new ExecutionContext();
         context.robotScript = robot;
         
