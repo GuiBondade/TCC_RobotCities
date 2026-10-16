@@ -2,14 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RobotTriggerInterface : MonoBehaviour
+public class RobotTriggerInterface : TriggerInterface<RobotScript>
 {
-    [SerializeField] private RobotScript robotScript;
-    private Vector2 mousePosition;
-
-    public void OnMouseDown() {
-        mousePosition = Input.mousePosition;
-        RobotSignals.TriggerInterfaceOpen(robotScript, mousePosition); 
-        Debug.Log("interface open");
+    public override void OpenInterface(RobotScript script, Vector2 position) {
+        RobotSignals.TriggerInterfaceOpen(script, position); 
+        Debug.Log("robot interface open");
     }
 }

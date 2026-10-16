@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 using ScriptRunner;
 
@@ -10,7 +11,6 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
         EXECUTAR TODOS OS ROBOS A CADA TICK
         ROBOS ADICIONADOS/RETIRADOS NA LISTA DE EXECUÇÃO A PARTIR DA ATIVAÇÃO/DESATIVAÇÃO PELO PLAYER
         
-        (NO SCRIPT DO ROBO VAI SER TROCADO A REF DO SCRIPT ANEXADO COM ESCOLHA EM DROPDOWN)
         (VAI SER CRIADO UMA LISTA DE SCRIPTS SALVOS COM ID E REFERENCIA PRO ARQUIVO JSON(a qual vai ser exposta no dropdown da interface dos robos),
             compiledScripts no scriptManager, dicionario de struct a ser melhorado)
 
@@ -20,6 +20,8 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
 
     private List<ExecutionContext> functionsInExecution = new List<ExecutionContext>(); 
     private List<ExecutionContext> functionsToRemove = new List<ExecutionContext>(); 
+
+    public TickSignal tickSignal;
 
     private void OnEnable() => RobotSignals.OnActivateExecution += ActivateExecution;
     private void OnDisable() => RobotSignals.OnDeactivateExecution -= DeactivateExecution;
@@ -59,7 +61,8 @@ public class ExecutionManager : MonoBehaviour // arquivo set/delete json
 
     // chamado a cada tick
     public void TickExecution(){
-        //Debug.Log(functionsInExecution.Count);
+        tickSignal.InvokeTick();
+
         foreach (var context in functionsInExecution) {
             if (context.ticksOcupado > 0) {
                 context.ticksOcupado--; // Reduz o tempo restante da animação/ação

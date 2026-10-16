@@ -3775,7 +3775,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 190, y: 135}
+  m_AnchoredPosition: {x: 199.52, y: 135}
   m_SizeDelta: {x: 100, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &765454060
@@ -3985,8 +3985,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 328.03, y: -211}
-  m_SizeDelta: {x: 282.0602, y: 38.225}
+  m_AnchoredPosition: {x: 342, y: -214}
+  m_SizeDelta: {x: 290.52, y: 38.225}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &847085638
 MonoBehaviour:
@@ -4003,8 +4003,8 @@ MonoBehaviour:
   toggle: {fileID: 847085639}
   toggleText: {fileID: 1153562306}
   toggleBackground: {fileID: 2068134693}
-  onActivatedText: "Descri\xE7\xE3o das A\xE7\xF5es: Ativo"
-  onDeactivatedText: "Descri\xE7\xE3o das A\xE7\xF5es: Inativo"
+  onActivatedText: "Exibir A\xE7\xF5es Recentes: Ativo"
+  onDeactivatedText: "Exibir A\xE7\xF5es Recentes: Inativo"
 --- !u!114 &847085639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4868,7 +4868,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &948386787
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4893,8 +4893,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -646, y: 224}
-  m_SizeDelta: {x: 480, y: 300}
+  m_AnchoredPosition: {x: -636.48285, y: 224}
+  m_SizeDelta: {x: 499.034, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &948386788
 MonoBehaviour:
@@ -4948,12 +4948,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptManager: {fileID: 1438266622}
+  repositionInterface: {fileID: 0}
   nameInput: {fileID: 22948294}
   scriptDropdown: {fileID: 580521126}
   executionToggle: {fileID: 1348154883}
   debugToggle: {fileID: 847085638}
-  interfaceRect: {fileID: 948386787}
-  canvasRect: {fileID: 906658539}
 --- !u!1 &970183413
 GameObject:
   m_ObjectHideFlags: 0
@@ -5085,7 +5084,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Execu\xE7\xE3o: Ativa"
+  m_text: "Executar C\xF3digo: Ativo"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5580,6 +5579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   robotInterface: {fileID: 948386790}
+  buildingInterface: {fileID: 0}
   deleteInterface: {fileID: 1922497514}
 --- !u!1 &1034439538
 GameObject:
@@ -6127,7 +6127,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Descri\xE7\xE3o das A\xE7\xF5es: Inativo"
+  m_text: "Exibir A\xE7\xF5es Recentes: Inativo"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7390,8 +7390,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 328.03, y: -263}
-  m_SizeDelta: {x: 282.06, y: 38.2263}
+  m_AnchoredPosition: {x: 342, y: -266}
+  m_SizeDelta: {x: 290.52, y: 38.226}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1348154882
 MonoBehaviour:
@@ -7468,8 +7468,8 @@ MonoBehaviour:
   toggle: {fileID: 1348154882}
   toggleText: {fileID: 974090271}
   toggleBackground: {fileID: 1390747418}
-  onActivatedText: "Execu\xE7\xE3o: Ativa"
-  onDeactivatedText: "Execu\xE7\xE3o: Inativa"
+  onActivatedText: "Executar C\xF3digo: Ativo"
+  onDeactivatedText: "Executar C\xF3digo: Inativo"
 --- !u!1 &1361635471
 GameObject:
   m_ObjectHideFlags: 0
