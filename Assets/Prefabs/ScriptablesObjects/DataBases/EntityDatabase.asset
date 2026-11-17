@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b4962d6ecde9624f84be3ee0a7c400d, type: 3}
+  m_Name: EntityDatabase
+  m_EditorClassIdentifier: 
+  constructionGroups:
+  - key: fabrica
+    label: "F\xE1brica"
+    constructions:
+    - {fileID: 11400000, guid: 7622737353ccbe5489961509863bc1c4, type: 2}
+    - {fileID: 11400000, guid: b510457e8770ca044a74ed5882c75fc7, type: 2}
+    - {fileID: 11400000, guid: 1d8ea34900b05b240830fd0f637b4523, type: 2}
+  - key: armazem
+    label: "Armaz\xE9m"
+    constructions:
+    - {fileID: 11400000, guid: c9e9668200bc06b4fab27c21709d9141, type: 2}
+    - {fileID: 11400000, guid: c8f99d940effce4488f46fd69160871b, type: 2}
+    - {fileID: 11400000, guid: 3a6c1fd4eb44a18488cfbcde3b982547, type: 2}
+  - key: ponte
+    label: Ponte
+    constructions:
+    - {fileID: 11400000, guid: f135a4fb5968d344ea94a8f8a2d19ec0, type: 2}
+  - key: mina
+    label: Mina
+    constructions:
+    - {fileID: 11400000, guid: fa5d4086b53bb084b96b743371d275e6, type: 2}
+  resourceGroups:
+  - key: arvore
+    label: "\xC1rvore"
+    resources:
+    - {fileID: 11400000, guid: 9a522feeeccf5b843823084ce5fd89d5, type: 2}
+    - {fileID: 11400000, guid: e64afa042a899a54ba462c1cfdefa323, type: 2}
+    - {fileID: 11400000, guid: b30e61678adea654f826b84af9bbfa87, type: 2}
+  - key: pedra
+    label: Pedra
+    resources:
+    - {fileID: 11400000, guid: d63fbb1f68b2d2c48adef48568e68425, type: 2}

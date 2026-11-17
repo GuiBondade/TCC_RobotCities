@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class ParameterConfig : MonoBehaviour
 {
@@ -16,6 +17,79 @@ public class ParameterConfig : MonoBehaviour
 
     public void OnTriggerButtonPress() {
         blocker.SetUIOnBlocker(refs.selectionArea);
+    }
+
+    // Chamado pelo input do parâmetro de signal ao terminar de digitar (enter/perda de foco).
+    // Adiciona o signal na lista UI (se não existir) ou altera a string lá (com propagação),
+    // e seleciona o botão do signal resultante, como se o usuário tivesse clicado nele.
+    public void OnSignalInputEndEdit(string text) {
+        var paramSetup = GetComponent<ParameterSetup>();
+        if (paramSetup == null || paramSetup.paramData == null || !paramSetup.paramData.CanInputText) return;
+
+        // o onEndEdit também dispara quando o input é desativado (ex.: selecionar um signal
+        // existente no popup esconde o input) — nesse caso não registra nada
+        if (refs.inputTextInstance == null || !refs.inputTextInstance.activeSelf) return;
+
+        text = text?.Trim();
+        if (string.IsNullOrEmpty(text)) return;
+
+        string finalName = string.IsNullOrEmpty(refs.selectedSignalName)
+            ? refs.executionManager.RegisterSignal(text)
+            : refs.executionManager.RenameSignal(refs.selectedSignalName, text);
+
+        if (string.IsNullOrEmpty(finalName)) return;
+
+        refs.selectedSignalName = finalName;
+
+        SelectValueByName(finalName);
+    }
+
+    // Chamado pelo input do parâmetro de texto (StringParameter) ao terminar de digitar.
+    // Diferente do signal: só guarda o texto — nada de registrar/renomear no ExecutionManager.
+    public void OnStringInputEndEdit(string text) {
+        var paramSetup = GetComponent<ParameterSetup>();
+        if (paramSetup == null || paramSetup.paramData == null || !paramSetup.paramData.CanInputText) return;
+
+        // o onEndEdit também dispara quando o input é desativado (ex.: escolher uma variável
+        // no popup esconde o input) — nesse caso não altera nada
+        if (refs.inputTextInstance == null || !refs.inputTextInstance.activeSelf) return;
+
+        text = text?.Trim();
+        refs.selectedVariableName = null;
+        refs.selectedSignalName = null;
+        refs.selectedFunctionName = null;
+
+        // o sentinel fica selecionado; o texto real é salvo lendo o input no WorkspaceSaveScript
+        string sentinel = paramSetup.GetValueAt(ParameterSections.StringValues, 0);
+        refs.selectedValueKey = string.IsNullOrEmpty(sentinel) ? text : sentinel;
+        refs.selectedValueSection = ParameterSections.StringValues;
+
+        refs.placeholderLabel.text = string.IsNullOrEmpty(text) ? paramSetup.paramData.defaultParamName : text;
+        refs.placeholderLabel.ForceMeshUpdate();
+        GetComponent<AdjustWidthByText>().AdjustWidth();
+    }
+
+    // Rebuilda os values da seção atual e reaplica a seleção do item com esse nome
+    // (como se o usuário tivesse clicado nele). Compartilhado por signal e função.
+    private void SelectValueByName(string finalName) {
+        if (refs.selectedSection == null) return;
+
+        UpdateValues(refs.selectedSection); // rebuild inclui o valor novo/renomeado
+
+        ValueInfo valueToSelect = null;
+        for (int i = 0; i < refs.valueContent.transform.childCount; i++) {
+            var value = refs.valueContent.transform.GetChild(i).GetComponent<ValueInfo>();
+            if (value != null && value.value == finalName) {
+                valueToSelect = value;
+                break;
+            }
+        }
+
+        if (valueToSelect != null) {
+            refs.selectedValueKey = null; // força ValuePressionado a reaplicar o estado (mesmo nome após rename)
+            refs.selectedValueVisual = null; // o visual antigo foi devolvido ao pool no UpdateValues
+            ValuePressionado(valueToSelect);
+        }
     }
 
     public void SectionPressionado(SectionInfo sectionPressed) { 
@@ -56,14 +130,56 @@ public class ParameterConfig : MonoBehaviour
                 ConfigureOperands(valuePressed.sectionCurrent, valuePressed.value);
             }
 
-            if (refs.variableManager.variables.ContainsKey(valueText)) {
+            var paramSetup = GetComponent<ParameterSetup>();
+            string signalSentinel = paramSetup.GetValueAt(ParameterSections.SignalValues, 0);
+
+            if (valuePressed.sectionCurrent == ParameterSections.SignalValues) {
+                refs.selectedVariableName = null;
+                refs.selectedFunctionName = null;
+                bool isTypedSignal = !string.IsNullOrEmpty(signalSentinel) && valuePressed.value == signalSentinel;
+                if (isTypedSignal) {
+                    // "Digitar...": mostra o input já com o signal atual (se houver) pra permitir editar/renomear
+                    if (refs.inputTextInstance != null) {
+                        var inputField = refs.inputTextInstance.GetComponent<TMP_InputField>();
+                        inputField.text = refs.selectedSignalName ?? string.Empty;
+                        refs.inputTextInstance.SetActive(true);
+                    }
+                } else {
+                    refs.selectedSignalName = valueText;
+                    if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
+                }
+            } else if (valuePressed.sectionCurrent == ParameterSections.FunctionValues) {
+                refs.selectedVariableName = null;
+                refs.selectedSignalName = null;
+                refs.selectedFunctionName = valueText;
+                if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
+            } else if (valuePressed.sectionCurrent == ParameterSections.StringValues) {
+                // texto livre: a seção só tem o sentinel "Digitar..." — mostra o input
+                refs.selectedVariableName = null;
+                refs.selectedSignalName = null;
+                refs.selectedFunctionName = null;
+                if (refs.inputTextInstance != null) {
+                    var inputField = refs.inputTextInstance.GetComponent<TMP_InputField>();
+                    // mantém o texto já digitado (o input é a fonte da verdade do parâmetro)
+                    if (inputField != null && !string.IsNullOrEmpty(inputField.text)) {
+                        refs.placeholderLabel.text = inputField.text;
+                        refs.placeholderLabel.ForceMeshUpdate();
+                    }
+                    refs.inputTextInstance.SetActive(true);
+                    if (inputField != null) inputField.ActivateInputField();
+                }
+            } else if (IsVariableOfSection(valueText, valuePressed.sectionCurrent)) {
                 refs.selectedVariableName = valueText;
+                refs.selectedSignalName = null;
+                refs.selectedFunctionName = null;
                 if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
             } else {
                 refs.selectedVariableName = null;
+                refs.selectedSignalName = null;
+                refs.selectedFunctionName = null;
                 if (refs.inputTextInstance != null) {
                     bool isInputValue = valuePressed.sectionCurrent == ParameterSections.IntValues
-                        && valuePressed.value == GetComponent<ParameterSetup>().GetValueAt(ParameterSections.IntValues, 0);
+                        && valuePressed.value == paramSetup.GetValueAt(ParameterSections.IntValues, 0);
                     refs.inputTextInstance.SetActive(isInputValue);
                 }
             }
@@ -84,6 +200,15 @@ public class ParameterConfig : MonoBehaviour
 
     private bool IsUnaryOperation(string operation) {
         return operation == "NÃO";
+    }
+
+    // Uma variável só é selecionada se ela pertence à mesma seção do valor clicado
+    // (evita que uma variável chamada "Pedra" sequestre a opção "Pedra" da seção de entidade).
+    private bool IsVariableOfSection(string variableName, ParameterSections section) {
+        if (section == ParameterSections.VariableValues)
+            return refs.variableManager.variables.ContainsKey(variableName);
+        return refs.variableManager.variables.TryGetValue(variableName, out var info)
+            && info.section == section;
     }
 
     private bool NeedsOperandRebuild(ParameterSections section, string operation) {
@@ -121,6 +246,13 @@ public class ParameterConfig : MonoBehaviour
                 InstantiateParameter(ref refs.rightOperand, ParameterType.AllTypeParameter, false, "All Types");
                 refs.parentesesInstance.transform.SetAsFirstSibling();
                 break;
+            case ParameterSections.BoolEntityOperations:
+                SetUnarySpacerActive(false);
+                refs.parentesesInstance.SetActive(true);
+                InstantiateParameter(ref refs.leftOperand, ParameterType.DirectionParameter, true, "Direção");
+                InstantiateParameter(ref refs.rightOperand, ParameterType.EntityParameter, false, "Entidade");
+                refs.parentesesInstance.transform.SetAsFirstSibling();
+                break;
             case ParameterSections.IntOperations:
             case ParameterSections.BoolIntComparisonOperations:
                 refs.parentesesInstance.SetActive(true);
@@ -131,6 +263,20 @@ public class ParameterConfig : MonoBehaviour
             case ParameterSections.BoolValues:
             case ParameterSections.DirectionValues:
             case ParameterSections.MaterialValues:
+            case ParameterSections.ToolValues:
+            case ParameterSections.SignalValues:
+            case ParameterSections.FunctionValues:
+            case ParameterSections.StringValues:
+            case ParameterSections.VariableValues:
+            case ParameterSections.EntityGeneralValues:
+            case ParameterSections.EntityConstructionValues:
+            case ParameterSections.EntityResourceValues:
+            case ParameterSections.Robos:
+            case ParameterSections.Construcoes:
+            case ParameterSections.Scripts:
+            case ParameterSections.Variaveis:
+            case ParameterSections.Funcoes:
+            case ParameterSections.Signals:
             case ParameterSections.IntValues:
                 SetUnarySpacerActive(false);
                 break;
@@ -182,6 +328,7 @@ public class ParameterConfig : MonoBehaviour
         refs.selectedValueKey = null;
         refs.selectedValueSection = ParameterSections.BoolValues;
         refs.selectedVariableName = null;
+        refs.selectedSignalName = null;
         if (refs.inputTextInstance != null) refs.inputTextInstance.SetActive(false);
 
         SectionInfo sectionToSelect = null;
@@ -199,6 +346,18 @@ public class ParameterConfig : MonoBehaviour
 
         if (sectionToSelect == null) return;
 
+        // signal: garante que o signal salvo existe na lista UI antes de reconstruir os values
+        // (a lista UI é limpa ao abrir o script; aqui ele é re-registrado)
+        if (refs.type == ParameterType.SignalParameter && !string.IsNullOrEmpty(savedValue)) {
+            refs.executionManager.RegisterSignal(savedValue);
+        }
+
+        // função: mesmo esquema do signal (a lista UI de funções é limpa ao abrir o script;
+        // o declare re-registra, mas se o call vier antes no arquivo garantimos aqui também)
+        if (refs.type == ParameterType.FunctionParameter && !string.IsNullOrEmpty(savedValue)) {
+            refs.executionManager.RegisterFunction(savedValue);
+        }
+
         UpdateValues(sectionToSelect);
         UpdateSelectedSection(sectionToSelect);
 
@@ -207,12 +366,31 @@ public class ParameterConfig : MonoBehaviour
             && sectionToSelect.sectionCurrent == ParameterSections.IntValues
             && int.TryParse(savedValue, out _);
 
+        // texto livre (StringParameter): o valor salvo é o próprio texto digitado
+        bool isTypedString = string.IsNullOrEmpty(savedVariableName)
+            && sectionToSelect.sectionCurrent == ParameterSections.StringValues;
+
         if (isTypedInt) {
             selectedValue = GetComponent<ParameterSetup>().GetValueAt(ParameterSections.IntValues, 0);
             if (refs.inputTextInstance != null) {
                 refs.inputTextInstance.GetComponent<TMP_InputField>().text = savedValue;
                 refs.inputTextInstance.SetActive(true);
             }
+        } else if (isTypedString) {
+            selectedValue = GetComponent<ParameterSetup>().GetValueAt(ParameterSections.StringValues, 0);
+            if (refs.inputTextInstance != null) {
+                refs.inputTextInstance.GetComponent<TMP_InputField>().text = savedValue ?? string.Empty;
+                refs.inputTextInstance.SetActive(true);
+            }
+            // o placeholder mostra o texto digitado (o sentinel só existe na lista do popup)
+            var paramSetup = GetComponent<ParameterSetup>();
+            refs.placeholderLabel.text = string.IsNullOrEmpty(savedValue)
+                ? (paramSetup.paramData != null ? paramSetup.paramData.defaultParamName : string.Empty)
+                : savedValue;
+            refs.placeholderLabel.ForceMeshUpdate();
+        } else if (refs.type == ParameterType.StringParameter && refs.inputTextInstance != null) {
+            // variável: o input não representa o valor — limpa o prefill que o Setup fez com o nome
+            refs.inputTextInstance.GetComponent<TMP_InputField>().text = string.Empty;
         }
 
         ValueInfo valueToSelect = null;
@@ -241,10 +419,16 @@ public class ParameterConfig : MonoBehaviour
 
         UpdateSelectedValue(valueToSelect);
         refs.selectedVariableName = savedVariableName;
-        refs.placeholderLabel.text = valueToSelect.label.text;
+        if (refs.type == ParameterType.SignalParameter) refs.selectedSignalName = selectedValue;
+        if (refs.type == ParameterType.FunctionParameter) refs.selectedFunctionName = selectedValue;
+        refs.placeholderLabel.text = isTypedString && !string.IsNullOrEmpty(savedValue)
+            ? savedValue
+            : valueToSelect.label.text;
         refs.placeholderLabel.ForceMeshUpdate();
 
-        if (!isTypedInt && refs.inputTextInstance != null) {
+        bool keepsTypedTextVisible = refs.type == ParameterType.SignalParameter
+            || (refs.type == ParameterType.StringParameter && isTypedString);
+        if (!isTypedInt && !keepsTypedTextVisible && refs.inputTextInstance != null) {
             refs.inputTextInstance.SetActive(false);
         }
     }
@@ -257,14 +441,62 @@ public class ParameterConfig : MonoBehaviour
             refs.blocksFactory.CleanUpValue(valueInfo);
         }
         var section = sectionInfo.sectionCurrent;
+
+        // Lista dinâmica (bloco de import): o provider do bloco monta os itens da seção.
+        // Tem precedência sobre a lista estática (o valor salvo é a 'key' do item).
+        if (refs.dynamicValueProvider != null)
+        {
+            var dynamicValues = refs.dynamicValueProvider(section);
+            if (dynamicValues != null)
+            {
+                foreach (var item in dynamicValues)
+                {
+                    refs.blocksFactory.InitializeValue(item.label, section, refs.valueContent.transform, false, item.key);
+                }
+                refs.valueContent.GetComponent<AdjustWidthByText>().AdjustWidth();
+                return;
+            }
+        }
+
+        var existingValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (string valor in sectionInfo.valueList) {
+            existingValues.Add(valor);
             refs.blocksFactory.InitializeValue(valor, section, refs.valueContent.transform);
         }
         var variablesNames = refs.variableManager.GetVarNamesBySection(section);
 
         foreach (string variable in variablesNames) {
+            if (!existingValues.Add(variable)) continue;
             refs.blocksFactory.InitializeValue(variable, section, refs.valueContent.transform);
         }
+
+        // signals: mesma ideia das variáveis — opções = lista UI + chaves do dicionário geral do ExecutionManager
+        if (section == ParameterSections.SignalValues) {
+            var signalNames = refs.executionManager.GetSignalOptions();
+
+            foreach (string signal in signalNames) {
+                if (!existingValues.Add(signal)) continue;
+                refs.blocksFactory.InitializeValue(signal, section, refs.valueContent.transform);
+            }
+        }
+
+        // funções: lista viva do ExecutionManager (espelho dos signals), alimenta o popup do call
+        if (section == ParameterSections.FunctionValues) {
+            var functionNames = refs.executionManager.GetFunctionOptions();
+
+            foreach (string function in functionNames) {
+                refs.blocksFactory.InitializeValue(function, section, refs.valueContent.transform);
+            }
+        }
+
+        // variáveis (seção única do parâmetro de texto): lista viva com todas as variáveis
+        if (section == ParameterSections.VariableValues) {
+            foreach (string variable in refs.variableManager.variables.Keys) {
+                if (!existingValues.Add(variable)) continue;
+                refs.blocksFactory.InitializeValue(variable, section, refs.valueContent.transform);
+            }
+        }
+
         refs.valueContent.GetComponent<AdjustWidthByText>().AdjustWidth();
     }
 
@@ -283,6 +515,8 @@ public class ParameterConfig : MonoBehaviour
         refs.selectedValueVisual = null;
         refs.selectedValueKey = null;
         refs.selectedValueSection = ParameterSections.BoolValues;
+        refs.selectedSignalName = null;
+        refs.selectedFunctionName = null;
 
         if (refs.leftOperand != null) {
             refs.blocksFactory.CleanUpParameter(refs.leftOperand);

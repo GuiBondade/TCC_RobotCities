@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e78870d56034b9e98b3f22b637733b7, type: 3}
+  m_Name: AraucariaTreeData
+  m_EditorClassIdentifier: 
+  displayName: "\xC1rvore de Carvalho"
+  resourceType: 2
+  typeId: 0
+  totalAmount: 20
+  resourcePrefab: {fileID: 4691544717233639687, guid: 6324adb4e036813408482b35a99a3031, type: 3}
+  tilesVisual:
+  - offset: {x: 0, y: 0}
+    tile: {fileID: 0}
+    allowedTerrain: 0
+  - offset: {x: 1, y: 0}
+    tile: {fileID: 11400000, guid: bb5616afb719d0e42a575e7157afea97, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 2, y: 0}
+    tile: {fileID: 11400000, guid: 317cc38a8fa44c8419a667063e2cf226, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 3, y: 0}
+    tile: {fileID: 0}
+    allowedTerrain: 0
+  - offset: {x: 0, y: 1}
+    tile: {fileID: 0}
+    allowedTerrain: 0
+  - offset: {x: 1, y: 1}
+    tile: {fileID: 11400000, guid: c2704ef862c096f41a3ba264045a12a1, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 2, y: 1}
+    tile: {fileID: 11400000, guid: 59bff45eb9479114797392513be212c5, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 3, y: 1}
+    tile: {fileID: 0}
+    allowedTerrain: 0
+  - offset: {x: 0, y: 2}
+    tile: {fileID: 11400000, guid: f2611dd9fb6690142ac5155aa636e5e4, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 1, y: 2}
+    tile: {fileID: 11400000, guid: 1dfb6417cd26830408b52c245fe43caa, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 2, y: 2}
+    tile: {fileID: 11400000, guid: fdbdc49159ec8b6459ec68c9017fef82, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 3, y: 2}
+    tile: {fileID: 11400000, guid: f0b13682b1029e04284d1fa249ca6413, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 0, y: 3}
+    tile: {fileID: 11400000, guid: ffefc6de404421b4780cc9e46b1b3021, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 1, y: 3}
+    tile: {fileID: 11400000, guid: 28e8201574ce49e44ad48cf72c0ba8e4, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 2, y: 3}
+    tile: {fileID: 11400000, guid: 2e27b6b967e843548882f726be255bed, type: 2}
+    allowedTerrain: 0
+  - offset: {x: 3, y: 3}
+    tile: {fileID: 11400000, guid: a01f5a6ea93904b4496a5efceea5eaca, type: 2}
+    allowedTerrain: 0
+  tilesOccupied:
+  - offset: {x: 0, y: 0}
+    tile: {fileID: 11400000, guid: bb5616afb719d0e42a575e7157afea97, type: 2}
+    allowedTerrain: 1
+  - offset: {x: 1, y: 0}
+    tile: {fileID: 11400000, guid: 317cc38a8fa44c8419a667063e2cf226, type: 2}
+    allowedTerrain: 1

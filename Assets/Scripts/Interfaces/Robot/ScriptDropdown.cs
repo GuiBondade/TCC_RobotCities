@@ -9,16 +9,23 @@ public class ScriptDropdown : MonoBehaviour
     [SerializeField] private string defaultOption;
 
     public void UpdateDropdown(List<ScriptData> scriptList, int selectedIndex) {
+        if (dropdown == null) return;
+
         dropdown.ClearOptions(); 
         optionsList.Clear();
         optionsList.Add(defaultOption);
-        foreach(var script in scriptList) {
-            optionsList.Add(script.name);
+
+        if (scriptList != null) {
+            foreach(var script in scriptList) {
+                if (script != null) optionsList.Add(script.name);
+            }
         }
 
         dropdown.AddOptions(optionsList);
 
-        dropdown.value = selectedIndex;
+        // SetValueWithoutNotify evita que popular o dropdown dispare OnValueChanged
+        // (o que antes desativava a execução ao abrir a interface).
+        dropdown.SetValueWithoutNotify(Mathf.Clamp(selectedIndex, 0, optionsList.Count - 1));
         dropdown.RefreshShownValue();
     }
 }

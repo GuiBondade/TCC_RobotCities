@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4bc8b855702ec845b14528c8f62f55a, type: 3}
+  m_Name: ArmazemT1
+  m_EditorClassIdentifier: 
+  id: armazemT1
+  displayName: "Armaz\xE9m de Madeira"
+  buildingPrefab: {fileID: 2056106917095112799, guid: 71d866ca3933c4a4bb6af120942bf283, type: 3}
+  tilesVisual:
+  - offset: {x: 0, y: 0}
+    tile: {fileID: 11400000, guid: ebc11cd613b69124b99796a2a3e91039, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 1, y: 0}
+    tile: {fileID: 11400000, guid: a1015b8c167ff12428e18fceed51ef76, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 2, y: 0}
+    tile: {fileID: 11400000, guid: 7046c12117d21c7438e461ec52b20c24, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 3, y: 0}
+    tile: {fileID: 11400000, guid: fa446b512f3dc27428eb047be4f414a2, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 4, y: 0}
+    tile: {fileID: 11400000, guid: e87e2fada46787e4ea01e3b332da76a4, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 5, y: 0}
+    tile: {fileID: 11400000, guid: d49826a82a6e9944c90eb79cd4eba2f2, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 0, y: 1}
+    tile: {fileID: 11400000, guid: 2fbec86a06bacbe4483ce88f107df23d, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 1, y: 1}
+    tile: {fileID: 11400000, guid: 4ba9fb4c7843eb140b482a3b619e173b, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 2, y: 1}
+    tile: {fileID: 11400000, guid: 91183af23c65494498c5d4771061de9c, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 3, y: 1}
+    tile: {fileID: 11400000, guid: f927f9acd73aa31419d6ee5160abcd28, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 4, y: 1}
+    tile: {fileID: 11400000, guid: 7e812dda80ca6c34fb6b01fbe15a9b99, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 5, y: 1}
+    tile: {fileID: 11400000, guid: b36215b616577c343bad798b511661db, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 0, y: 2}
+    tile: {fileID: 11400000, guid: c48f6830c1b0e1947b59f48c7db3f466, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 1, y: 2}
+    tile: {fileID: 11400000, guid: 755baf40f9a331742b0105e8830ac91b, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 2, y: 2}
+    tile: {fileID: 11400000, guid: 61f850b0514061443ae95dd8d8613e87, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 3, y: 2}
+    tile: {fileID: 11400000, guid: 6a7e2b5a73209044095952166abbdaf1, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 4, y: 2}
+    tile: {fileID: 11400000, guid: 646345ed75af16842ac8a38e57c00d5b, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 5, y: 2}
+    tile: {fileID: 11400000, guid: 7c563068f9610dc419fbc2baec84891f, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 0, y: 3}
+    tile: {fileID: 11400000, guid: 433fee4b958561e41b4d14d551eaa592, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 1, y: 3}
+    tile: {fileID: 11400000, guid: 7e11d5da7434edd44b9b8efe3f35c1fd, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 2, y: 3}
+    tile: {fileID: 11400000, guid: d7badf6bd7f4b754ca108277cb35a5f2, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 3, y: 3}
+    tile: {fileID: 11400000, guid: a6e7f048a5dfbf34499de583f6389898, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 4, y: 3}
+    tile: {fileID: 11400000, guid: 76bd32d758865024e92ade28a6c22d28, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  - offset: {x: 5, y: 3}
+    tile: {fileID: 11400000, guid: cacc55878d8ed5c4b9bd93b2eb83551c, type: 2}
+    allowedTerrain: 0
+    walkable: 0
+  tilesOccupied:
+  - offset: {x: 0, y: 0}
+    tile: {fileID: 11400000, guid: ebc11cd613b69124b99796a2a3e91039, type: 2}
+    allowedTerrain: 1
+    walkable: 0
+  - offset: {x: 1, y: 0}
+    tile: {fileID: 11400000, guid: a1015b8c167ff12428e18fceed51ef76, type: 2}
+    allowedTerrain: 1
+    walkable: 0
+  - offset: {x: 2, y: 0}
+    tile: {fileID: 11400000, guid: 7046c12117d21c7438e461ec52b20c24, type: 2}
+    allowedTerrain: 1
+    walkable: 0
+  - offset: {x: 3, y: 0}
+    tile: {fileID: 11400000, guid: fa446b512f3dc27428eb047be4f414a2, type: 2}
+    allowedTerrain: 1
+    walkable: 0
+  - offset: {x: 4, y: 0}
+    tile: {fileID: 11400000, guid: e87e2fada46787e4ea01e3b332da76a4, type: 2}
+    allowedTerrain: 1
+    walkable: 0
+  - offset: {x: 5, y: 0}
+    tile: {fileID: 11400000, guid: d49826a82a6e9944c90eb79cd4eba2f2, type: 2}
+    allowedTerrain: 1
+    walkable: 0
+  constructionLayout: {fileID: 11400000, guid: 75249d07fda67874fbff09a6b3725707, type: 2}
+  constructionTicks: 20
+  availableLayouts:
+  - {fileID: 11400000, guid: 26bd5744aae9c4c4faa812dd38f2619e, type: 2}
+  defaultSlotLayout: {fileID: 11400000, guid: 26bd5744aae9c4c4faa812dd38f2619e, type: 2}
+  walkableAfterConstruction: 0
+  isExtractable: 0
+  extractableResourceType: 0
+  extractableMaterialTypeId: -1

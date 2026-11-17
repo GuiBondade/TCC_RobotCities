@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/UIScene.unity
     guid: 4ccc7f4548faa3749b7ab4e9b30564dd
+  - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: 54ff152adfdcb914b8ab2dc4da13a61f
+  - enabled: 1
+    path: Assets/Scenes/CondicionalLoop.unity
+    guid: e238d1d46d3a81c4aadceb9b02ae0ed7
   m_configObjects: {}

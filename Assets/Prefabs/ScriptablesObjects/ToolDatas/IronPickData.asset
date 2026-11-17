@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e57b2d157c9246f4997eea014772a1bf, type: 3}
+  m_Name: IronPickData
+  m_EditorClassIdentifier: 
+  id: 4
+  displayName: Picareta de Ferro
+  icon: {fileID: 21300000, guid: 19b821681612c5a48bfb45e8d76bbb10, type: 3}
+  kind: 1
+  acceptedResourceTypes: 01000000
+  yieldPerUse: 4
+  ticksPerUse: 2
+  maxUses: 20

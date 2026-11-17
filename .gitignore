@@ -104,3 +104,6 @@ InitTestScene*.unity*
 # Ignora arquivos de manifesto extras do compilador (arquivos com ícone de RSS na imagem)
 *.csproj
 *.editor
+
+# Ignora documentacao local do agente
+AGENTS.md

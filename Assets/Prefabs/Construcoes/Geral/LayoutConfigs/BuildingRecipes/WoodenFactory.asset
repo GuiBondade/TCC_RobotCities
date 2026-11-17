@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb33a3a519e7084cb5770e88ccae318, type: 3}
+  m_Name: WoodenFactory
+  m_EditorClassIdentifier: 
+  recipeConfigName: "F\xE1brica de Madeira"
+  icon: {fileID: 21300000, guid: 931b53b1e89bdaa48af6bae1735a9f82, type: 3}
+  slotConfigList:
+  - slotIndex: 0
+    typeId: 0
+    hasTypeLocked: 1
+    role: 0
+    craftAmount: 5
+    maxAmount: 0

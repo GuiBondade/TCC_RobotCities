@@ -9,6 +9,8 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
 {
     private VariableManager variableManager; 
     [SerializeField] private SectionDatabase sectionDatabase;
+    // Toggle "Exportar": variável pode ser importada por outro script.
+    [SerializeField] private ExportToggleUI exportToggle;
     
     public TMP_InputField inputVarName;
     public TMP_Dropdown varTypeDropdown;
@@ -28,6 +30,9 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
         Debug.Log(variableManager);
     }
 
+    // Variável exportada: pode ser importada por outro script.
+    public bool IsExported => exportToggle != null && exportToggle.IsExported;
+
     public void Setup() {
         if (variableManager == null) variableManager = VariableManager.instancia;
     
@@ -38,6 +43,8 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
             OnDefaultValueDropdownSelect(0);
         defaultValueDropdown.value = 0;
 
+        if (exportToggle != null) exportToggle.Setup(false);
+
         /* inputIntValue.text = null;
         inputIntValue.gameObject.SetActive(false); */
 
@@ -45,13 +52,15 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
         Debug.Log(variableName);
     }
 
-    public void SetupWithData(string varName, ParameterType varType, ParameterSections section, string defaultValue) {
+    public void SetupWithData(string varName, ParameterType varType, ParameterSections section, string defaultValue, bool exported = false) {
         if (variableManager == null) variableManager = VariableManager.instancia;
         
         // 1. Seta os nomes e textos iniciais
         variableName = variableManager.CreateVariable(varName);
         VariableManager.instancia.UpdateVariableData(variableName, varType, section, defaultValue);
         inputVarName.text = variableName;
+
+        if (exportToggle != null) exportToggle.SetExported(exported);
 
         // 2. Sincroniza o Dropdown de Tipo visualmente
         string varTypeString = varType.ToString();
@@ -83,33 +92,17 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
     }
 
     public void SelectVarType(int index) {
-        Debug.Log("selectedTypeIndex: " + selectedTypeIndex);
         if (index != selectedTypeIndex) {
             selectedTypeIndex = index;
             string varTypeString = varTypeDropdown.options[index].text; 
-            ParameterSections section = ParameterSections.BoolValues;
             ParameterType varType;
             if (Enum.TryParse<ParameterType>(varTypeString, out ParameterType type)) {
                 varType = type;
             } else {
                 varType = ParameterType.BooleanParameter;
             }
-            Debug.Log("Tipo clicado no dropdown das variáveis foi traduzido para ParameterType: " + varTypeString);
-            switch (varType) {
-                case ParameterType.BooleanParameter:
-                    section = ParameterSections.BoolValues;
-                    break;
-                case ParameterType.IntParameter:
-                    section = ParameterSections.IntValues;
-                    break;
-                case ParameterType.DirectionParameter:
-                    section = ParameterSections.DirectionValues;
-                    break;
-                case ParameterType.MaterialParameter:
-                    section = ParameterSections.MaterialValues;
-                    break;
-            }
-            // alterar opções de valor default da variável criada
+
+            ParameterSections section = ParameterSetup.SectionForType(varType);
             var valuesList = sectionDatabase.GetValuesForSection(section);
             defaultValueDropdown.ClearOptions();
             defaultValueDropdown.AddOptions(valuesList);
@@ -120,7 +113,8 @@ public class CreateVariableUI : BlockUIWorkspaceGeneric
                 inputIntValue.gameObject.SetActive(false);
             }
 
-            variableManager.UpdateVariableData(variableName, varType, section, valuesList[0]); // ja chama handle variable retyped
+            string defaultValue = valuesList.Count > 0 ? valuesList[0] : string.Empty;
+            variableManager.UpdateVariableData(variableName, varType, section, defaultValue); // ja chama handle variable retyped
         }
     }
 

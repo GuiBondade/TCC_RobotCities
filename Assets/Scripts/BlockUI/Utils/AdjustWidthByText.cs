@@ -20,6 +20,12 @@ public class AdjustWidthByText : MonoBehaviour
         if (fontWidthGO == null || targetRect == null) { //|| tmpText == null) {
             return;
         }
+        // Container vazio (ex.: seção dinâmica sem valores): não existe GetChild(0)
+        // pra ler o padding — mantém a largura atual em vez de estourar.
+        if (fontWidthGO.transform.childCount == 0) {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(targetRect);
+            return;
+        }
         listLabelLayout.Clear();
         float biggestChildWidth = 0;
         for (int j = 0; j < fontWidthGO.transform.childCount; j++ ) {

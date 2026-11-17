@@ -1,34 +1,31 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 
 public class StringUtils
 {
-    private static int copyCounter; 
-    private static string formattedString;
-    private static string finalString;
-
-
+    // Devolve o texto original ou, se ele já existir na lista, acrescenta sufixos
+    // "(1)", "(2)"... sem limite artificial. Usado por scripts, variáveis e nomes
+    // de entidades do mapa.
     public static string EnsureUniqueString(string str, IEnumerable<string> stringList, string defaultString) {
-        formattedString = str.Trim();
-        
+        string formattedString = str != null ? str.Trim() : string.Empty;
+
         if (string.IsNullOrEmpty(formattedString)) {
-            formattedString = defaultString;
+            formattedString = string.IsNullOrEmpty(defaultString) ? string.Empty : defaultString.Trim();
         }
 
-        Func<string, bool> exists = stringList switch
-        {
-            ISet<string> set => set.Contains,
-            ICollection<string> col when col is not List<string> && col is not string[] => col.Contains,
-            _ => new HashSet<string>(stringList, StringComparer.OrdinalIgnoreCase).Contains
-        };
-        
-        finalString = formattedString;
-        copyCounter = 1;
+        var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (stringList != null) {
+            foreach (string item in stringList) {
+                if (item != null) existing.Add(item);
+            }
+        }
 
-        while (exists(finalString) && copyCounter < 10) {
-            finalString = $"{formattedString} ({copyCounter})";
+        if (!existing.Contains(formattedString)) return formattedString;
+
+        var finalString = formattedString;
+        int copyCounter = 1;
+        while (existing.Contains(finalString)) {
+            finalString = formattedString + " (" + copyCounter + ")";
             copyCounter++;
         }
 
