@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86434261fa3e24b4e9f2709051095ae1, type: 3}
   m_Name: ObjectiveCatalog
   m_EditorClassIdentifier: 
-  objectives: []
+  objectives:
+  - {fileID: 11400000, guid: 0423848345b74852ada394c255013795, type: 2}
+  - {fileID: 11400000, guid: 63060c0a04aa49418552e68fcc7c5379, type: 2}
+  - {fileID: 11400000, guid: 044af51a7efa40189ea72c54cc523256, type: 2}
+  - {fileID: 11400000, guid: 96ef67f713e54ec68fb3c51ba17dc598, type: 2}
+  - {fileID: 11400000, guid: dd10d7babdf844f194a572e1f8c504d4, type: 2}
